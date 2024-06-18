@@ -29,13 +29,30 @@ endif()
 find_package(OpenGL REQUIRED)
 set(OpenGL_GL_PREFERENCE LEGACY)
 
+# glib
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GLIB REQUIRED glib-2.0)
+
+include_directories(${GLIB_INCLUDE_DIRS})
+link_directories(${GLIB_LIBRARY_DIRS})
+
+# local libs
 set(LIB_DIR ${CMAKE_SOURCE_DIR}/lib)
 add_subdirectory(${LIB_DIR}/glfw)
+# add_subdirectory(${LIB_DIR}/glew)
+add_definitions(${GLIB_CFLAGS_OTHER})
+add_subdirectory(${LIB_DIR}/cglm EXCLUDE_FROM_ALL)
+
 
 include_directories(
         ${OPENGL_INCLUDE_DIRS}
         ${LIB_DIR}/glad/include
+        ${LIB_DIR}/glad/include
+        ${LIB_DIR}/glew/include
         ${LIB_DIR}/glfw/include
+        ${LIB_DIR}/cglm/include
+        ${LIB_DIR}/stb_include
+        ${CMAKE_SOURCE_DIR}/src
 )
 
 add_library(glad OBJECT ${LIB_DIR}/glad/src/glad.c)
@@ -46,7 +63,7 @@ add_library(glad OBJECT ${LIB_DIR}/glad/src/glad.c)
 include(FetchContent)
 
 # The compiled library code is here
-# add_subdirectory(src)
+add_subdirectory(src)
 
 # The executable code is here
 add_subdirectory(apps)

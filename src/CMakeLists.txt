@@ -1,2 +1,23 @@
-add_executable(opengl-poc-src src/main.c)
-target_link_libraries(opengl-poc-src glad glfw)
+add_library(opengl-poc-lib assets.c
+        assets.h
+        ${PROJECT_SOURCE_DIR}/lib/stb_include/stb_implementation.c
+        sprite.c
+        shader.c
+        texture.c
+        texture.h
+        shader.h
+        sprite.h
+        window.h
+        window.c
+        render.h
+        debug.h
+        debug.c
+) # Add other source files as needed
+target_include_directories(
+        opengl-poc-lib
+        PUBLIC ../include
+        "${PROJECT_SOURCE_DIR}/lib/glad/include"
+        "${PROJECT_SOURCE_DIR}/lib/glfw3/include"
+        "${PROJECT_SOURCE_DIR}/lib/cglm/include"
+)
+target_link_libraries(opengl-poc-lib glad ${GLIB_LIBRARIES} glfw cglm_headers)
