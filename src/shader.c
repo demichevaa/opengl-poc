@@ -19,9 +19,7 @@ int shaderProgramInitialize(
 
 int shaderProgramUse(const ShaderProgram *program) {
         glUseProgram(program->id);
-        printf("Shader use program. program_id: %d\n", program->id);
 
-        //printf("[SHADER:USE] -> Shader program %d in use\n", program->id);
         return EXIT_SUCCESS;
 }
 
@@ -50,6 +48,7 @@ int shaderProgramCompile(const ShaderProgram *program) {
         shaderHandleErrors(sVertex);
         glAttachShader(program->id, sVertex);
 
+
         sFragment = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(sFragment, 1, &program->fragmentSource, NULL);
         glCompileShader(sFragment);
@@ -57,6 +56,7 @@ int shaderProgramCompile(const ShaderProgram *program) {
         glAttachShader(program->id, sFragment);
 
         glLinkProgram(program->id);
+
         shaderProgramHandleErrors(program->id);
 
         glDeleteShader(sVertex);
@@ -108,22 +108,39 @@ int uniformGetLocation(int *location,
         return EXIT_SUCCESS;
 }
 
-int shaderSetMat4(ShaderProgram *shader, const char *uniformName, mat4 *model) {
+int shaderSetMat3(ShaderProgram *shader, const char *uniformName, mat3 *value) {
         int location;
         uniformGetLocation(&location, shader, uniformName);
-        //int location = glGetUniformLocation(shader->id, uniformName);
-        glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)model);
+
+        glUniformMatrix3fv(location, 1, GL_FALSE, (const GLfloat *)value);
 
         return EXIT_SUCCESS;
 }
 
-int shaderSetVec3f(ShaderProgram *shader, const char *uniformName, vec3 *vec) {
+
+int shaderSetMat4(ShaderProgram *shader, const char *uniformName, mat4 *value) {
         int location;
         uniformGetLocation(&location, shader, uniformName);
 
-//        int location = glGetUniformLocation(shader->id, uniformName);
+        glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)value);
 
-        glUniform3f(location, *vec[0], *vec[1], *vec[2]);
+        return EXIT_SUCCESS;
+}
+
+int shaderSetVec3f(ShaderProgram *shader, const char *uniformName, vec3 *value) {
+        int location;
+        uniformGetLocation(&location, shader, uniformName);
+
+        glUniform3f(location, *value[0], *value[1], *value[2]);
+
+        return EXIT_SUCCESS;
+}
+
+int shaderSetFloat(const ShaderProgram *shader, const char *uniformName, float value) {
+        int location;
+        uniformGetLocation(&location, shader, uniformName);
+
+        glUniform1f(location, value);
 
         return EXIT_SUCCESS;
 }
@@ -132,10 +149,7 @@ int shaderSetInt(const ShaderProgram *shader, const char *uniformName, int value
         int location;
         uniformGetLocation(&location, shader, uniformName);
 
-//        int location = glGetUniformLocation(shader->id, uniformName);
-
         glUniform1i(location, value);
 
-        printf("Set uniform: %d\n", shader->id);
         return EXIT_SUCCESS;
 }

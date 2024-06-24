@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-//#include <glad/glad.h>
 #include <cglm/cglm.h>
 #include "render.h"
 
@@ -24,8 +23,10 @@ int shaderProgramCompile(const ShaderProgram *program);
 int shaderProgramUse(const ShaderProgram *program);
 int shaderProgramDelete(const ShaderProgram *program);
 
-int shaderSetMat4(ShaderProgram *shader, const char *uniformName, mat4 *model);
-int shaderSetVec3f(ShaderProgram *shader, const char *uniformName, vec3 *vec);
+int shaderSetMat3(ShaderProgram *shader, const char *uniformName, mat3 *value);
+int shaderSetMat4(ShaderProgram *shader, const char *uniformName, mat4 *value);
+int shaderSetVec3f(ShaderProgram *shader, const char *uniformName, vec3 *value);
 int shaderSetInt(const ShaderProgram *shader, const char *uniformName, int value);
+int shaderSetFloat(const ShaderProgram *shader, const char *uniformName, float value);
 
 #endif //OPENGL_POC_SRC_SHADER_H_

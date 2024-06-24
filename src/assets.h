@@ -14,6 +14,8 @@ int shaderCreateFromAssets(ShaderProgram *shader,
                            const char *vertexAssetRelativePath,
                            const char *fragmentAssetRelativePath,
                            const char *geometryAssetRelativePath);
-int spriteCreateFromAssets(Sprite *sprite, const char *textureRelativePath);
+int spriteCreateFromAssets(Sprite *sprite,
+                           const char *tag,
+                           const char *textureRelativePath);
 
 #endif // ASSETS_H

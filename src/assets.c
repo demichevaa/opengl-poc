@@ -11,7 +11,7 @@ int textureCreateFromAssets(Texture2D *texture, const char *assetRelativePath) {
         stbi_set_flip_vertically_on_load(1);
         int width, height, nrChannels;
         unsigned char
-            *data = stbi_load(file_name, &width, &height, &nrChannels, 0);
+            *data = stbi_load(file_name, &width, &height, &nrChannels, 4);
 
         textureInitialize(texture, width, height, data);
         textureBind(texture);
@@ -86,16 +86,19 @@ int shaderCreateFromAssets(ShaderProgram *shader,
         return EXIT_SUCCESS;
 }
 
-int spriteCreateFromAssets(Sprite *sprite, const char *textureRelativePath) {
-        ShaderProgram program;
-        shaderCreateFromAssets(&program, "shaders/test.vertex.glsl", "shaders/test.fragment.glsl", NULL);
+int spriteCreateFromAssets(Sprite *sprite, const char *tag, const char *textureRelativePath) {
+        // TODO: Create multiple sprites
+        // TODO: Move to sprite initialize
+        ShaderProgram *program = malloc(sizeof(ShaderProgram));
+        shaderCreateFromAssets(program, "shaders/sprite.vertex.glsl", "shaders/sprite.fragment.glsl", NULL);
 
-        Texture2D texture;
-        textureCreateFromAssets(&texture, textureRelativePath);
+        Texture2D *texture = malloc(sizeof(Texture2D));
+        textureCreateFromAssets(texture, textureRelativePath);
 
-        spriteInitialize(sprite, &program, &texture);
+        spriteInitialize(sprite, tag, program, texture);
         printf(
-            "[ASSETS:SPRITE] -> Sprite created for %s\n",
+            "[ASSETS:SPRITE] -> Sprite `%s` created for %s\n",
+            sprite->tag,
             textureRelativePath
             );
 
