@@ -1,4 +1,4 @@
-add_executable(opengl-poc-app main.c
+add_executable(opengl-poc-app
         game.c
         game.h
         level.h

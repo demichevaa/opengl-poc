@@ -3,8 +3,8 @@
 
 #include "cglm/vec2.h"
 
-extern const int SCREEN_WIDTH;
-extern const int SCREEN_HEIGHT;
+extern const float SCREEN_WIDTH;
+extern const float SCREEN_HEIGHT;
 extern const float SCREEN_ASPECT_RATIO;
 
 

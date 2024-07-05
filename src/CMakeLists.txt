@@ -14,8 +14,8 @@ add_library(opengl-poc-lib assets.c
         debug.c
         screen.h
         screen.c
-        units.c
-        units.h
+        viewport.c
+        viewport.h
 ) # Add other source files as needed
 target_include_directories(
         opengl-poc-lib

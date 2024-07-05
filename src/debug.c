@@ -57,3 +57,14 @@ void APIENTRY glDebugOutput(GLenum source,
 
         exit(EXIT_FAILURE);
 }
+
+int debugMat4Print(mat4 mat) {
+        for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                        printf("%d\t", (int) mat[i][j]);
+                }
+                printf("\n");
+        }
+
+        return EXIT_SUCCESS;
+}

@@ -15,9 +15,9 @@ typedef struct Sprite {
         float rotation;
         vec3 color;
 
-        mat3 scale;
-        mat3 model;
-        mat3 projection;
+        mat4 scale;
+        mat4 model;
+        mat4 projection;
         unsigned int VAO;
         unsigned int VBO;
         unsigned int EBO;

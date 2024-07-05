@@ -5,7 +5,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "window.h"
+#include "viewport.h"
 
 // Window dimensions
 
@@ -14,10 +14,11 @@ const GLchar* vertexShaderSource = "#version 330 core\n"
                                    "layout (location = 0) in vec3 position;\n"
                                    "layout (location = 1) in vec2 texCoords;\n"
                                    "out vec2 TexCoords;\n"
-                                   "uniform mat4 MVP;\n"
+                                   "uniform mat4 model;\n"
+                                   "uniform mat4 projection;\n"
                                    "void main()\n"
                                    "{\n"
-                                   "    gl_Position = MVP * vec4(position, 1.0);\n"
+                                   "    gl_Position = projection * model * vec4(position, 1.0);\n"
                                    "    TexCoords = texCoords;\n"
                                    "}\0";
 
@@ -31,20 +32,32 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
                                      "    color = texture(ourTexture, TexCoords);\n"
                                      "}\0";
 
+//// Game units
+//const float GAME_WIDTH = 160.0f;
+//const float GAME_HEIGHT = 90.0f;
+//const float GAME_ASPECT = GAME_WIDTH / GAME_HEIGHT;
+
 // Screen size
-const float screenWidth = 768;  // Get the actual screen width
-const float screenHeight = 432; // Get the actual screen height
+const float screenWidth = 640;  // Get the actual screen width
+const float screenHeight = 480; // Get the actual screen height
 const float screenAspect = screenWidth / screenHeight;
 
-void mat4_mul(mat4 a, mat4 b, mat4 result) {
-        for (int i = 0; i < 4; i++) {
-                for (int j = 0; j < 4; j++) {
-                        result[i][j] = 0.0f;
-                        for (int k = 0; k < 4; k++) {
-                                result[i][j] += a[i][k] * b[k][j];
-                        }
-                }
-        }
+
+int ortho(mat4 *matrix, float left, float right, float bottom, float top, float near, float far) {
+        glm_mat4_identity(*matrix);
+
+        (*matrix)[0][0] = 2 / (right - left);
+        (*matrix)[1][1] = 2 / (top - bottom);
+        (*matrix)[2][2] = -2 / (far - near);
+
+        (*matrix)[0][3] = -(right + left) / (right - left);
+        (*matrix)[1][3] = -(top + bottom) / (top - bottom);
+        (*matrix)[2][3] = -(far + near) / (far - near);
+
+        (*matrix)[3][3] = 1;
+
+
+        return EXIT_SUCCESS;
 }
 
 // Function prototypes
@@ -64,6 +77,25 @@ int debugMat4Print(mat4 mat) {
 // The MAIN function, from here we start the application and run the game loop
 int main()
 {
+        // Calculate scale factor
+        float scale;
+        if (screenAspect > GAME_ASPECT) {
+                // Screen is wider than game, fit game height to screen height
+                scale = screenHeight / GAME_HEIGHT;
+        } else {
+                // Screen is narrower than game, fit game width to screen width
+                scale = screenWidth / GAME_WIDTH;
+        }
+
+        // Calculate game size on screen
+        float gameWidthOnScreen = GAME_WIDTH * scale;
+        float gameHeightOnScreen = GAME_HEIGHT * scale;
+
+        // Calculate offsets for centering the game on the screen
+        float offsetX = (screenWidth - gameWidthOnScreen) / 2.0f;
+        float offsetY = (screenHeight - gameHeightOnScreen) / 2.0f;
+
+        // Init GLFW
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -79,7 +111,8 @@ int main()
         // Initialize GLAD to setup the OpenGL Function pointers
         gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-        glViewport(0, 0, screenWidth, screenHeight);
+        // Define the viewport dimensions
+        //glViewport(0, 0, WIDTH, HEIGHT);
 
         // Build and compile our shader program
         GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -95,16 +128,6 @@ int main()
         glAttachShader(shaderProgram, fragmentShader);
         glLinkProgram(shaderProgram);
 
-        int success;
-        char infoLog[1024];
-        glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-        if (!success) {
-                glGetProgramInfoLog(shaderProgram, 1024, NULL, infoLog);
-                fprintf(stderr, "ERROR::Shader::Linking:\n%s", infoLog);
-                exit(EXIT_FAILURE);
-        }
-
-
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
 
@@ -112,9 +135,9 @@ int main()
         GLfloat vertices[] = {
             // Positions          // Texture Coords
             1.0f,  1.0f, 0.0f,   1.0f, 1.0f,   // Top Right
-            1.0f, 0.0f,  0.0f,  1.0f, 0.0f,   // Bottom Right
-            0.0f, 0.0f,  0.0f,  0.0f, 0.0f,   // Bottom Left
-            0.0f,  1.0f, 0.0f,   0.0f, 1.0f    // Top Left
+            1.0f, -1.0f, 0.0f,   1.0f, 0.0f,   // Bottom Right
+            -1.0f, -1.0f, 0.0f,   0.0f, 0.0f,   // Bottom Left
+            -1.0f,  1.0f, 0.0f,   0.0f, 1.0f    // Top Left
         };
         GLuint indices[] = {  // Note that we start from 0!
             0, 1, 3,   // First Triangle
@@ -166,52 +189,54 @@ int main()
         }
         stbi_image_free(image);
 
-        mat4 model, view, _projection, MVP, _scale, translate, rotate;
+        glViewport(offsetX, offsetY, gameWidthOnScreen, gameHeightOnScreen);
+        glScissor(offsetX, offsetY, gameWidthOnScreen, gameHeightOnScreen);
+        glEnable(GL_SCISSOR_TEST);
+
+        mat4 model;
         glm_mat4_identity(model);
-        glm_mat4_identity(view);
-        glm_mat4_identity(_projection);
-        glm_mat4_identity(_scale);
-        glm_mat4_identity(translate);
-        glm_mat4_identity(rotate);
-
-        _scale[0][0] = 10;
-        _scale[1][1] = 10;
-
-        translate[0][3] = 0;
-        translate[1][3] = 0;
-
-        mat4 tmp;
-        mat4_mul(rotate, _scale, tmp);
-        mat4_mul(translate, tmp, model);
-
-        printf("Model:\n");
         debugMat4Print(model);
 
+        vec4 spriteSpawn = {0.0f, 0.0f, 0.0f, 0.0f};
+        vec4 spriteScale = {160.0f, 90.0f, 0.0f, 0.0f};
 
-        float aspect_ratio = 16.0f/9.0f;
-        float ORIGIN_WIDTH = 0;
-        float ORIGIN_HEIGHT = 0;
-        float SCREEN_WIDTH = 160;
-        float SCREEN_HEIGHT = 90;
-        float Z_FAR = 1;
-        float Z_NEAR = -1;
+        vec2 currentPos = {model[3][0], model[3][1]};
 
-        _projection[0][0] = 2 / (SCREEN_WIDTH - ORIGIN_WIDTH);
-        _projection[1][1] = 2 / (SCREEN_HEIGHT - ORIGIN_HEIGHT);
-        _projection[2][2] = 2 / (Z_FAR - Z_NEAR);
-        _projection[0][3] = - (SCREEN_WIDTH + ORIGIN_WIDTH) / (SCREEN_WIDTH - ORIGIN_WIDTH);
-        _projection[1][3] = - (SCREEN_HEIGHT + ORIGIN_HEIGHT) / (SCREEN_HEIGHT - ORIGIN_HEIGHT);
-        _projection[2][3] = - (Z_FAR + Z_NEAR) / (Z_FAR - Z_NEAR);
+        float x, y;
+        x = spriteSpawn[0] - currentPos[0];
+        y = spriteSpawn[1] - currentPos[1];
+        glm_translate(model, (vec4){x, y, 0.0f, 0.0f});
+        printf("Translate 2\n");
+        debugMat4Print(model);
 
-        printf("Projection:\n");
-        debugMat4Print(_projection);
+        glm_scale(model, spriteScale);
+        printf("Scale\n");
+        debugMat4Print(model);
+//
+//        glm_translate(model, (vec2){10.0f, 10.0f});
+//        printf("Translate 2\n");
+//        debugMat4Print(model);
 
-        mat4_mul(_projection, model, MVP);
-        glm_mat4_transpose(MVP);
 
-        printf("MVP:\n");
-        debugMat4Print(MVP);
+        //glm_scale(model, (vec3){30.0f, 30.0f, 0.0f}); // Scale uniformly
 
+
+
+        mat4 projection;
+        float left, right, top, bottom;
+        float unitInPixels = screenWidth / GAME_WIDTH;
+        left = 0;//-(unitInPixels * GAME_WIDTH);
+        right = (unitInPixels * GAME_WIDTH) / 2;
+        top = unitInPixels * GAME_HEIGHT / 2;
+        bottom = 0;//-unitInPixels * GAME_HEIGHT;
+        //glm_ortho(left, right, bottom, top, -1.0f, 1.0f, projection);
+        glm_ortho(left, right, bottom, top, -1.0f, 1.0f, projection);
+
+        //ortho(&projection, offsetX, offsetX + gameWidthOnScreen, offsetY, offsetY + gameHeightOnScreen, -1.0f, 1.0f);
+
+        //glm_ortho(offsetX, offsetX + gameWidthOnScreen, offsetY, offsetY + gameHeightOnScreen, -1.0f, 1.0f, projection);
+        printf("Projection\n");
+        debugMat4Print(projection);
         while (!glfwWindowShouldClose(window))
         {
 
@@ -239,16 +264,17 @@ int main()
 
                 //glm_ortho(0.0f, WIDTH, 0.0f, HEIGHT, -1.0f, 1.0f, projection);
                 // Get their uniform location
-                GLint modelLoc = glGetUniformLocation(shaderProgram, "MVP");
+                GLint modelLoc = glGetUniformLocation(shaderProgram, "model");
+                GLint projLoc = glGetUniformLocation(shaderProgram, "projection");
 
                 // Pass them to the shaders
-                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, (GLfloat*)MVP);
+                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, (GLfloat*)model);
+                glUniformMatrix4fv(projLoc, 1, GL_FALSE, (GLfloat*)projection);
 
                 // Draw container
                 glBindVertexArray(VAO);
                 glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
                 glBindVertexArray(0);
-
 
                 // Swap the screen buffers
                 glfwSwapBuffers(window);
