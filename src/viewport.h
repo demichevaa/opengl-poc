@@ -4,9 +4,10 @@
 #include "window.h"
 #include <cglm/cglm.h>
 
-extern const float GAME_WIDTH;
-extern const float GAME_HEIGHT;
-extern const float GAME_ASPECT;
+extern const float VIEWPORT_WIDTH;
+extern const float VIEWPORT_HEIGHT;
+extern const float VIEWPORT_ORIGIN;
+extern const float VIEWPORT_ASPECT_RATIO;
 
 int viewportSetOrthogonalProjection(mat4 *p_projection);
 

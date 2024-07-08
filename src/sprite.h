@@ -3,21 +3,25 @@
 
 #include "cglm/cglm.h"
 #include <limits.h>
+#include <memory.h>
 
 #include "shader.h"
 #include "texture.h"
+#include "viewport.h"
+
 
 typedef struct Sprite {
         const char *tag;
         ShaderProgram *shader;
         Texture2D *texture;
-        vec2 position;
-        float rotation;
-        vec3 color;
 
-        mat4 scale;
-        mat4 model;
-        mat4 projection;
+        float X;
+        float Y;
+        float width;
+        float height;
+
+        mat4 MVP;
+
         unsigned int VAO;
         unsigned int VBO;
         unsigned int EBO;

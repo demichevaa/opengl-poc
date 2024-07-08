@@ -1,23 +1,39 @@
 #include "level.h"
 
-int levelInitialize(Level *level, int rowsCount, int colsCount, int data[rowsCount][colsCount]) {
+float calcColMargin(int colsCount, float colSize, float containerSize) {
+        return  (containerSize - ((float)colsCount * colSize)) / 2.0f;
+}
 
-        level->blocks = malloc(rowsCount * sizeof(Block *));
+
+int levelInitialize(Level *level, int rowsCount, int colsCount, int data[rowsCount][colsCount]) {
         level->rowsCount = rowsCount;
         level->columnsCount = colsCount;
 
+        float blockWidth = 10.0f;
+        float blockHeight = 5.0f;
+
+        float blockPadding = 0.1f;
+        float blockWidthAligned = blockWidth + blockPadding;
+        float blockHeightAligned = blockHeight + blockPadding;
+
+        float colMargin = calcColMargin(colsCount, blockWidthAligned, VIEWPORT_WIDTH);
+        float rowMargin = 2.0f;
+
+        float xOrigin = VIEWPORT_ORIGIN + colMargin;
+        float x = xOrigin;
+        float y = VIEWPORT_HEIGHT - rowMargin;
+
+
+        level->blocks = malloc(rowsCount * sizeof(Block *));
         for (int i = 0; i < rowsCount; i++) {
+                y -= blockHeightAligned;
                 level->blocks[i] = malloc(colsCount * sizeof(Block));
                 for (int j = 0; j < colsCount; j++) {
-                        Sprite blockSprite;
-                        Block block;
-
-                        spriteCreateFromAssets(&blockSprite, "simple_block", "textures/block.png");
-
-                        block.sprite = blockSprite;
-                        block.value = data[i][j];
+                        Block block = blockCreateSimple(blockWidth, blockHeight, x, y);
                         level->blocks[i][j] = block;
+                        x += blockWidthAligned;
                 }
+                x = xOrigin;
         }
         return EXIT_SUCCESS;
 }

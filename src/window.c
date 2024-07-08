@@ -1,8 +1,29 @@
 #include "window.h"
 
 void tempDebugInputCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
+void inputCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
-int windowInitialize(Window *p_window, char *title, float width, float height) {
+GLFWwindow* createWindow(float width, float height) {
+        glfwInit();
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
+        GLFWwindow* window = glfwCreateWindow((int)width, (int)height, "LearnOpenGL", NULL, NULL);
+        glfwMakeContextCurrent(window);
+
+        gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+        glViewport(0, 0, (int) width, (int) height);
+
+        glfwSetKeyCallback(window, inputCallback);
+
+
+        return window;
+}
+
+GLFWwindow* windowInitialize(Window *p_window, char *title, float width, float height) {
         printf("[WINDOW:INITIALIZE] -> Creating glfw window (%dx%d): `%s` \n", (int)width, (int)height, title);
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -16,15 +37,15 @@ int windowInitialize(Window *p_window, char *title, float width, float height) {
         if (window == NULL) {
                 fprintf(stderr, "Failed to create GLFW window");
                 glfwTerminate();
-                return EXIT_FAILURE;
+                //return EXIT_FAILURE;
         }
         glfwMakeContextCurrent(window);
-        glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+        //glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
                 fprintf(stderr, "Failed to initialize GLAD\n");
                 glfwTerminate();
-                return EXIT_FAILURE;
+                //return EXIT_FAILURE;
         }
 
         glViewport(0, 0, (int)width, (int)height);
@@ -45,9 +66,9 @@ int windowInitialize(Window *p_window, char *title, float width, float height) {
         p_window->glfw_window = window;
 
 
-        windowRegisterInputCallback(p_window);
+        windowRegisterInputCallback(inputCallback);
 
-        return EXIT_SUCCESS;
+        return window;
 }
 
 int windowRegisterInputCallback(Window *p_window) {
@@ -62,6 +83,11 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 }
 
 void tempDebugInputCallback(GLFWwindow* window, int key, int scancode, int action, int mode) {
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+                glfwSetWindowShouldClose(window, GL_TRUE);
+}
+
+void inputCallback(GLFWwindow* window, int key, int scancode, int action, int mode) {
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
                 glfwSetWindowShouldClose(window, GL_TRUE);
 }

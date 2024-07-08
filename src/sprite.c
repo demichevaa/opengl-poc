@@ -1,20 +1,27 @@
 #include "sprite.h"
-#include "viewport.h"
 
 float SPRITE_VERTICES[] = {
-    -0.5f, -0.5f,       0.0f, 0.0f,
-    0.5f, -0.5f,          1.0f, 0.0f,
-    -0.5f, 0.5f,          0.0f, 1.0f,
-    0.5f, 0.5f,           1.0f, 1.0f,
+        // Positions                // Texture Coords
+        1.0f,  1.0f,  0.0f,         1.0f, 1.0f,   // Top Right
+        1.0f,  0.0f,  0.0f,         1.0f, 0.0f,   // Bottom Right
+        0.0f,  0.0f,  0.0f,         0.0f, 0.0f,   // Bottom Left
+        0.0f,  1.0f,  0.0f,         0.0f, 1.0f    // Top Left
 };
 unsigned int SPRITE_INDICES[] = {
-    0, 1, 2,
-    2, 1, 3,
+        0, 1, 3,
+        1, 2, 3
 };
 
-
-
-int spriteSetOrthogonalProjection(Sprite *sprite, float left, float right, float bottom, float top);
+void mat4_mul(mat4 a, mat4 b, mat4 result) {
+        for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                        result[i][j] = 0.0f;
+                        for (int k = 0; k < 4; k++) {
+                                result[i][j] += a[i][k] * b[k][j];
+                        }
+                }
+        }
+}
 
 int spriteInitialize(Sprite *sprite,
                      const char *tag,
@@ -24,68 +31,89 @@ int spriteInitialize(Sprite *sprite,
         sprite->shader = shader;
         sprite->texture = texture;
 
-        glm_mat4_identity(sprite->model);
+        sprite->height = 10;
+        sprite->width = 10;
+        sprite->X = 0;
+        sprite->Y = 0;
 
-        glGenVertexArrays(1, &sprite->VAO);
-        glGenBuffers(1, &sprite->VBO);
-        glGenBuffers(1, &sprite->EBO);
+        GLuint VBO, VAO, EBO;
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+        glGenBuffers(1, &EBO);
 
-        glBindVertexArray(sprite->VAO);
+        glBindVertexArray(VAO);
 
-        glBindBuffer(GL_ARRAY_BUFFER, sprite->VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(SPRITE_VERTICES), SPRITE_VERTICES, GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite->EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(SPRITE_INDICES), SPRITE_INDICES, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
         glEnableVertexAttribArray(1);
 
-        shaderProgramUse(sprite->shader);
-//        10	0	0	0
-//        0	10	0	0
-//        0	0	0	0
-//        10	10	0	1
+        glBindVertexArray(0);
 
-//        shaderSetInt(sprite->shader, "image", 0);
-//        vec3 color = {0.80f, 0.05f, 0.18f};
-//        shaderSetVec3f(sprite->shader, "color", &color);
+        sprite->VBO = VBO;
+        sprite->VAO = VAO;
+        sprite->EBO = EBO;
 
-        vec2 defaultPosition = {0.0f, 0.0f};
-        vec2 defaultScale = {1.0f, 1.0f};
-
-        viewportSetOrthogonalProjection(&sprite->projection);
-        glm_scale(sprite->model, (vec3){100.0f, 100.0f, 1.0f});
-        spriteSetPosition(sprite, defaultPosition);
-
-
-        //spriteSetRotationAngle(sprite, 90.0f);
-        //spriteSetOrthogonalProjection(sprite, 0.0f, (float)SCREEN_WIDTH, 0.0f, (float)SCREEN_HEIGHT);
-
-//        spriteSetPosition(sprite, defaultPosition);
-//        spriteSetScale(sprite, defaultScale);
-
+//        mat4 model, view, projection, MVP, scale, translate, rotate;
+//        glm_mat4_identity(model);
+//        glm_mat4_identity(view);
+//        glm_mat4_identity(projection);
+//        glm_mat4_identity(scale);
+//        glm_mat4_identity(translate);
+//        glm_mat4_identity(rotate);
+//
+//
+//        scale[0][0] = sprite->width;
+//        scale[1][1] = sprite->height;
+//
+//        translate[0][3] = sprite->X;
+//        translate[1][3] = sprite->Y;
+//
+//        mat4 tmp;
+//        mat4_mul(rotate, scale, tmp);
+//        mat4_mul(translate, tmp, model);
+//
+//        float Z_FAR = 1;
+//        float Z_NEAR = -1;
+//
+//        projection[0][0] = 2 / (VIEWPORT_WIDTH - VIEWPORT_ORIGIN);
+//        projection[1][1] = 2 / (VIEWPORT_HEIGHT - VIEWPORT_ORIGIN);
+//        projection[2][2] = 2 / (Z_FAR - Z_NEAR);
+//        projection[0][3] = - (VIEWPORT_WIDTH + VIEWPORT_ORIGIN) / (VIEWPORT_WIDTH - VIEWPORT_ORIGIN);
+//        projection[1][3] = - (VIEWPORT_HEIGHT + VIEWPORT_ORIGIN) / (VIEWPORT_HEIGHT - VIEWPORT_ORIGIN);
+//        projection[2][3] = - (Z_FAR + Z_NEAR) / (Z_FAR - Z_NEAR);
+//
+//        mat4_mul(projection, model, MVP);
+//        glm_mat4_transpose(MVP);
+//
+//        debugMat4Print(MVP);
+//        memcpy(sprite->MVP, MVP, sizeof(mat4));
+//        shaderProgramUse(sprite->shader);
 
         spriteApplyModel(sprite);
-
-        //shaderSetFloat(sprite->shader, "aspectRatio", SCREEN_ASPECT_RATIO);
 
         return EXIT_SUCCESS;
 }
 
 int spriteRender(Sprite *sprite) {
+        spriteApplyModel(sprite);
 
         glActiveTexture(GL_TEXTURE0);
         textureBind(sprite->texture);
 
         shaderProgramUse(sprite->shader);
+        shaderSetMat4(sprite->shader, "MVP", &sprite->MVP);
 
         glBindVertexArray(sprite->VAO);
-
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
 
         return EXIT_SUCCESS;
 }
@@ -105,29 +133,47 @@ int spriteRelease(Sprite *sprite) {
         sprite->VBO = INT_MAX;
 
         printf("[SPRITE:RELEASE] -> Sprite `%s` destroyed", sprite->tag);
+        //free(sprite);
         sprite = NULL;
 
         return EXIT_SUCCESS;
 }
 
 int spriteApplyModel(Sprite *sprite) {
+        mat4 model, view, projection, MVP, scale, translate, rotate;
+        glm_mat4_identity(model);
+        glm_mat4_identity(view);
+        glm_mat4_identity(projection);
+        glm_mat4_identity(scale);
+        glm_mat4_identity(translate);
+        glm_mat4_identity(rotate);
 
-        shaderSetMat4(sprite->shader, "projection", &sprite->projection);
-        shaderSetMat4(sprite->shader, "model", &sprite->model);
 
-        printf("model:\n");
-        debugMat4Print(sprite->model);
-        printf("projection:\n");
-        debugMat4Print(sprite->projection);
+        scale[0][0] = sprite->width;
+        scale[1][1] = sprite->height;
 
-        return EXIT_SUCCESS;
-}
+        translate[0][3] = sprite->X;
+        translate[1][3] = sprite->Y;
 
-int spriteSetPosition(Sprite *sprite, const vec2 position) {
-        glm_translate(sprite->model, (vec3){position[0], position[1], 0.0f});
+        mat4 tmp;
+        mat4_mul(rotate, scale, tmp);
+        mat4_mul(translate, tmp, model);
 
-        sprite->position[0] = position[0];
-        sprite->position[1] = position[1];
+        float Z_FAR = 1;
+        float Z_NEAR = -1;
+
+        projection[0][0] = 2 / (VIEWPORT_WIDTH - VIEWPORT_ORIGIN);
+        projection[1][1] = 2 / (VIEWPORT_HEIGHT - VIEWPORT_ORIGIN);
+        projection[2][2] = 2 / (Z_FAR - Z_NEAR);
+        projection[0][3] = - (VIEWPORT_WIDTH + VIEWPORT_ORIGIN) / (VIEWPORT_WIDTH - VIEWPORT_ORIGIN);
+        projection[1][3] = - (VIEWPORT_HEIGHT + VIEWPORT_ORIGIN) / (VIEWPORT_HEIGHT - VIEWPORT_ORIGIN);
+        projection[2][3] = - (Z_FAR + Z_NEAR) / (Z_FAR - Z_NEAR);
+
+        mat4_mul(projection, model, MVP);
+        glm_mat4_transpose(MVP);
+
+        //debugMat4Print(MVP);
+        memcpy(sprite->MVP, MVP, sizeof(mat4));
 
         return EXIT_SUCCESS;
 }

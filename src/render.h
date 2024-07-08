@@ -4,6 +4,5 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "screen.h"
 
 #endif //OPENGL_POC_SRC_RENDER_H_

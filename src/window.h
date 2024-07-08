@@ -6,7 +6,6 @@
 
 #include "debug.h"
 #include "render.h"
-#include "screen.h"
 
 typedef struct Window {
         float width;
@@ -14,8 +13,9 @@ typedef struct Window {
         GLFWwindow *glfw_window;
 } Window;
 
+GLFWwindow* createWindow(float width, float height);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-int windowInitialize(Window *p_window, char *title, float width, float height);
+GLFWwindow* windowInitialize(Window *p_window, char *title, float width, float height);
 int windowRegisterInputCallback(Window *p_window);
 
 

@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <cglm/cglm.h>
 #include "render.h"
 
 void debug();

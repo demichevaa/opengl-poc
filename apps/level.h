@@ -3,6 +3,8 @@
 
 #include "block.h"
 #include "assets.h"
+#include "viewport.h"
+
 
 typedef struct Level {
         Block ** blocks;
