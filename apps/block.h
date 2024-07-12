@@ -6,10 +6,20 @@
 
 typedef struct Block {
         Sprite sprite;
-        int value;
+        unsigned int health;
+        bool isDestroyable;
 } Block;
 
-Block blockCreateSimple(float width, float height, float X, float Y);
+enum BlockType {
+    WALL = -1,
+    HP_5 = 5,
+    HP_4 = 4,
+    HP_3 = 3,
+    HP_2 = 2,
+    HP_1 = 1
+};
 
+Block blockCreateSimple(float width, float height, float X, float Y, enum BlockType type,
+                        unsigned int hp, bool isDestroyable);
 
 #endif //OPENGL_POC_APPS_BLOCK_H_

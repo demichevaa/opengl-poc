@@ -127,11 +127,20 @@ int shaderSetMat4(ShaderProgram *shader, const char *uniformName, mat4 *value) {
         return EXIT_SUCCESS;
 }
 
-int shaderSetVec3f(ShaderProgram *shader, const char *uniformName, vec3 *value) {
+int shaderSetVec3f(ShaderProgram *shader, const char *uniformName, vec3 value) {
         int location;
         uniformGetLocation(&location, shader, uniformName);
 
-        glUniform3f(location, *value[0], *value[1], *value[2]);
+        glUniform3f(location, value[0], value[1], value[2]);
+
+        return EXIT_SUCCESS;
+}
+
+int shaderSetVec4f(ShaderProgram *shader, const char *uniformName, vec4 value) {
+        int location;
+        uniformGetLocation(&location, shader, uniformName);
+
+        glUniform4f(location, value[0], value[1], value[2], value[3]);
 
         return EXIT_SUCCESS;
 }

@@ -14,6 +14,7 @@ add_library(opengl-poc-lib assets.c
         debug.c
         viewport.c
         viewport.h
+        palette.h
 ) # Add other source files as needed
 target_include_directories(
         opengl-poc-lib

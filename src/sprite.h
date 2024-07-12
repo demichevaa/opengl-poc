@@ -5,9 +5,11 @@
 #include <limits.h>
 #include <memory.h>
 
+
 #include "shader.h"
 #include "texture.h"
 #include "viewport.h"
+#include "palette.h"
 
 
 typedef struct Sprite {
@@ -19,6 +21,7 @@ typedef struct Sprite {
         float Y;
         float width;
         float height;
+        vec4 color;
 
         mat4 MVP;
 

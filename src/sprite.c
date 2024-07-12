@@ -1,7 +1,8 @@
 #include "sprite.h"
 
+
 float SPRITE_VERTICES[] = {
-        // Positions                // Texture Coords
+        // Positions                            // Texture Coords
         1.0f,  1.0f,  0.0f,         1.0f, 1.0f,   // Top Right
         1.0f,  0.0f,  0.0f,         1.0f, 0.0f,   // Bottom Right
         0.0f,  0.0f,  0.0f,         0.0f, 0.0f,   // Bottom Left
@@ -35,6 +36,7 @@ int spriteInitialize(Sprite *sprite,
         sprite->width = 10;
         sprite->X = 0;
         sprite->Y = 0;
+        memcpy(sprite->color, PALETTE.transparent, sizeof(vec4));
 
         GLuint VBO, VAO, EBO;
         glGenVertexArrays(1, &VAO);
@@ -60,43 +62,6 @@ int spriteInitialize(Sprite *sprite,
         sprite->VBO = VBO;
         sprite->VAO = VAO;
         sprite->EBO = EBO;
-
-//        mat4 model, view, projection, MVP, scale, translate, rotate;
-//        glm_mat4_identity(model);
-//        glm_mat4_identity(view);
-//        glm_mat4_identity(projection);
-//        glm_mat4_identity(scale);
-//        glm_mat4_identity(translate);
-//        glm_mat4_identity(rotate);
-//
-//
-//        scale[0][0] = sprite->width;
-//        scale[1][1] = sprite->height;
-//
-//        translate[0][3] = sprite->X;
-//        translate[1][3] = sprite->Y;
-//
-//        mat4 tmp;
-//        mat4_mul(rotate, scale, tmp);
-//        mat4_mul(translate, tmp, model);
-//
-//        float Z_FAR = 1;
-//        float Z_NEAR = -1;
-//
-//        projection[0][0] = 2 / (VIEWPORT_WIDTH - VIEWPORT_ORIGIN);
-//        projection[1][1] = 2 / (VIEWPORT_HEIGHT - VIEWPORT_ORIGIN);
-//        projection[2][2] = 2 / (Z_FAR - Z_NEAR);
-//        projection[0][3] = - (VIEWPORT_WIDTH + VIEWPORT_ORIGIN) / (VIEWPORT_WIDTH - VIEWPORT_ORIGIN);
-//        projection[1][3] = - (VIEWPORT_HEIGHT + VIEWPORT_ORIGIN) / (VIEWPORT_HEIGHT - VIEWPORT_ORIGIN);
-//        projection[2][3] = - (Z_FAR + Z_NEAR) / (Z_FAR - Z_NEAR);
-//
-//        mat4_mul(projection, model, MVP);
-//        glm_mat4_transpose(MVP);
-//
-//        debugMat4Print(MVP);
-//        memcpy(sprite->MVP, MVP, sizeof(mat4));
-//        shaderProgramUse(sprite->shader);
-
         spriteApplyModel(sprite);
 
         return EXIT_SUCCESS;
@@ -110,6 +75,9 @@ int spriteRender(Sprite *sprite) {
 
         shaderProgramUse(sprite->shader);
         shaderSetMat4(sprite->shader, "MVP", &sprite->MVP);
+        shaderSetVec4f(sprite->shader, "spriteColor", sprite->color);
+        float aspectRatio = sprite->width / sprite->height;
+        shaderSetFloat(sprite->shader, "textureAspectRatio", aspectRatio);
 
         glBindVertexArray(sprite->VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -162,17 +130,25 @@ int spriteApplyModel(Sprite *sprite) {
         float Z_FAR = 1;
         float Z_NEAR = -1;
 
+        float aspect = 16.0/9.0;
+        //projection[0][0] = 2 / (aspect * (VIEWPORT_WIDTH - VIEWPORT_ORIGIN));
         projection[0][0] = 2 / (VIEWPORT_WIDTH - VIEWPORT_ORIGIN);
+
+        //projection[1][1] = 2 / (aspect * (VIEWPORT_HEIGHT - VIEWPORT_ORIGIN));
         projection[1][1] = 2 / (VIEWPORT_HEIGHT - VIEWPORT_ORIGIN);
+
         projection[2][2] = 2 / (Z_FAR - Z_NEAR);
+        //projection[0][3] = - (aspect * (VIEWPORT_WIDTH + VIEWPORT_ORIGIN)) / (VIEWPORT_WIDTH - VIEWPORT_ORIGIN);
         projection[0][3] = - (VIEWPORT_WIDTH + VIEWPORT_ORIGIN) / (VIEWPORT_WIDTH - VIEWPORT_ORIGIN);
         projection[1][3] = - (VIEWPORT_HEIGHT + VIEWPORT_ORIGIN) / (VIEWPORT_HEIGHT - VIEWPORT_ORIGIN);
         projection[2][3] = - (Z_FAR + Z_NEAR) / (Z_FAR - Z_NEAR);
 
+        //projection[1][1] *= aspect;
+
+
         mat4_mul(projection, model, MVP);
         glm_mat4_transpose(MVP);
 
-        //debugMat4Print(MVP);
         memcpy(sprite->MVP, MVP, sizeof(mat4));
 
         return EXIT_SUCCESS;

@@ -90,7 +90,7 @@ int spriteCreateFromAssets(Sprite *sprite, const char *tag, const char *textureR
         // TODO: Create multiple sprites
         // TODO: Move to sprite initialize
         ShaderProgram *program = malloc(sizeof(ShaderProgram));
-        shaderCreateFromAssets(program, "shaders/test.vertex.glsl", "shaders/test.fragment.glsl", NULL);
+        shaderCreateFromAssets(program, "shaders/block.vertex.glsl", "shaders/block.fragment.glsl", NULL);
 
         Texture2D *texture = malloc(sizeof(Texture2D));
         textureCreateFromAssets(texture, textureRelativePath);
@@ -104,4 +104,3 @@ int spriteCreateFromAssets(Sprite *sprite, const char *tag, const char *textureR
 
         return EXIT_SUCCESS;
 }
-

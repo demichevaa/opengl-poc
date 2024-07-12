@@ -1,0 +1,19 @@
+;paint.net Palette File
+;Downloaded from Lospec.com/palette-list
+;Palette Name: OtterPop14
+;Description: Beaches n' ice cream.
+;Colors: 14
+FFf49863
+FFfa522e
+FFb62929
+FF727677
+FFaea070
+FF499247
+FF38573f
+FF54343a
+FF1e7a8d
+FF4dae95
+FFacc1ab
+FFf4cc8f
+FFe2aa2d
+FFc35d32

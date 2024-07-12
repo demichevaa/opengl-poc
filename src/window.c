@@ -48,6 +48,9 @@ GLFWwindow* windowInitialize(Window *p_window, char *title, float width, float h
                 //return EXIT_FAILURE;
         }
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         glViewport(0, 0, (int)width, (int)height);
         //glMatrixMode(GL_PROJECTION);
 

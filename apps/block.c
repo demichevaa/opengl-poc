@@ -1,16 +1,78 @@
 #include "block.h"
 
-Block blockCreateSimple(float width, float height, float X, float Y) {
+
+int assignDecodedColor(vec4 color, enum BlockType colorCode) {
+        switch (colorCode) {
+                case WALL: {
+                        glm_vec4_copy((float *) &PALETTE.cabSav, color);
+                        break;
+                }
+                case HP_1: {
+                        glm_vec4_copy((float *) &PALETTE.goldTips, color);
+                        break;
+                }
+                case HP_2: {
+                        glm_vec4_copy((float *) &PALETTE.sandyBrown, color);
+                        break;
+                }
+                case HP_3: {
+                        glm_vec4_copy((float *) &PALETTE.outrageousOrange, color);
+                        break;
+                }
+                case HP_4: {
+                        glm_vec4_copy((float *) &PALETTE.fireBrick, color);
+                        break;
+                }
+                case HP_5: {
+                        glm_vec4_copy((float *) &PALETTE.cherokee, color);
+                        break;
+                }
+                default: {
+                        fprintf(stderr, "[LEVEL:INITIALIZE] -> Unknown color code %d\n", colorCode);
+                        glm_vec4_copy((float *) &PALETTE.transparent, color);
+                        return EXIT_FAILURE;
+                }
+        }
+
+        return EXIT_SUCCESS;
+}
+
+
+Block blockCreateSimple(
+        float width,
+        float height,
+        float X,
+        float Y,
+        enum BlockType type,
+        unsigned int hp,
+        bool isDestroyable
+) {
+        ShaderProgram *program = malloc(sizeof(ShaderProgram));
+        shaderCreateFromAssets(program, "shaders/block.vertex.glsl", "shaders/block.fragment.glsl", NULL);
+
+        Texture2D *texture = malloc(sizeof(Texture2D));
+        if (type == WALL) {
+                textureCreateFromAssets(texture,  "textures/block_solid.png");
+        }
+        else {
+                textureCreateFromAssets(texture,  "textures/block.png");
+        }
+
         Block block;
-        Sprite sprite;
+        spriteInitialize(&block.sprite, "block", program, texture);
 
-        spriteCreateFromAssets(&sprite, "simple_block", "textures/block.png");
-
-        sprite.width = width;
-        sprite.height = height;
-        block.sprite = sprite;
+        //Sprite sprite;
+        block.sprite.width = width;
+        block.sprite.height = height;
+        //block.sprite = sprite;
         block.sprite.X = X;
         block.sprite.Y = Y;
+
+        assignDecodedColor(block.sprite.color, type);
+
+        if (isDestroyable) {
+                block.health = 0;
+        }
 
         return block;
 }
