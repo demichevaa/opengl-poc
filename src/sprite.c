@@ -1,6 +1,5 @@
 #include "sprite.h"
 
-
 float SPRITE_VERTICES[] = {
         // Positions                            // Texture Coords
         1.0f,  1.0f,  0.0f,         1.0f, 1.0f,   // Top Right
@@ -67,17 +66,19 @@ int spriteInitialize(Sprite *sprite,
         return EXIT_SUCCESS;
 }
 
-int spriteRender(Sprite *sprite) {
-        spriteApplyModel(sprite);
-
+int spriteRender(Sprite *sprite, Callback callback) {
         glActiveTexture(GL_TEXTURE0);
         textureBind(sprite->texture);
 
         shaderProgramUse(sprite->shader);
+
+
+        if (callback != NULL) {
+                callback(sprite);
+        }
+        spriteApplyModel(sprite);
         shaderSetMat4(sprite->shader, "MVP", &sprite->MVP);
         shaderSetVec4f(sprite->shader, "spriteColor", sprite->color);
-        float aspectRatio = sprite->width / sprite->height;
-        shaderSetFloat(sprite->shader, "textureAspectRatio", aspectRatio);
 
         glBindVertexArray(sprite->VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -130,20 +131,14 @@ int spriteApplyModel(Sprite *sprite) {
         float Z_FAR = 1;
         float Z_NEAR = -1;
 
-        float aspect = 16.0/9.0;
-        //projection[0][0] = 2 / (aspect * (VIEWPORT_WIDTH - VIEWPORT_ORIGIN));
         projection[0][0] = 2 / (VIEWPORT_WIDTH - VIEWPORT_ORIGIN);
 
-        //projection[1][1] = 2 / (aspect * (VIEWPORT_HEIGHT - VIEWPORT_ORIGIN));
         projection[1][1] = 2 / (VIEWPORT_HEIGHT - VIEWPORT_ORIGIN);
 
         projection[2][2] = 2 / (Z_FAR - Z_NEAR);
-        //projection[0][3] = - (aspect * (VIEWPORT_WIDTH + VIEWPORT_ORIGIN)) / (VIEWPORT_WIDTH - VIEWPORT_ORIGIN);
         projection[0][3] = - (VIEWPORT_WIDTH + VIEWPORT_ORIGIN) / (VIEWPORT_WIDTH - VIEWPORT_ORIGIN);
         projection[1][3] = - (VIEWPORT_HEIGHT + VIEWPORT_ORIGIN) / (VIEWPORT_HEIGHT - VIEWPORT_ORIGIN);
         projection[2][3] = - (Z_FAR + Z_NEAR) / (Z_FAR - Z_NEAR);
-
-        //projection[1][1] *= aspect;
 
 
         mat4_mul(projection, model, MVP);

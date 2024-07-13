@@ -145,6 +145,15 @@ int shaderSetVec4f(ShaderProgram *shader, const char *uniformName, vec4 value) {
         return EXIT_SUCCESS;
 }
 
+int shaderSetVec2f(ShaderProgram *shader, const char *uniformName, vec2 value) {
+        int location;
+        uniformGetLocation(&location, shader, uniformName);
+
+        glUniform2f(location, value[0], value[1]);
+
+        return EXIT_SUCCESS;
+}
+
 int shaderSetFloat(const ShaderProgram *shader, const char *uniformName, float value) {
         int location;
         uniformGetLocation(&location, shader, uniformName);

@@ -18,4 +18,6 @@ int spriteCreateFromAssets(Sprite *sprite,
                            const char *tag,
                            const char *textureRelativePath);
 
+const extern char *ASSETS_ROOT_DIR;
+
 #endif // ASSETS_H

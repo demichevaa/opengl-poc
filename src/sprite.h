@@ -10,6 +10,7 @@
 #include "texture.h"
 #include "viewport.h"
 #include "palette.h"
+#include "common.h"
 
 
 typedef struct Sprite {
@@ -33,7 +34,7 @@ typedef struct Sprite {
 
 
 int spriteInitialize(Sprite *sprite, const char *tag, ShaderProgram *shader, Texture2D *texture);
-int spriteRender(Sprite *sprite);
+int spriteRender(Sprite *sprite, Callback callback);
 int spriteRelease(Sprite *sprite);
 int spriteSetPosition(Sprite *sprite, const vec2 position);
 int spriteSetScale(Sprite *sprite, vec2 scale);

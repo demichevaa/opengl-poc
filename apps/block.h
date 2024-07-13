@@ -21,5 +21,6 @@ enum BlockType {
 
 Block blockCreateSimple(float width, float height, float X, float Y, enum BlockType type,
                         unsigned int hp, bool isDestroyable);
+int blockRender(Block *p_block);
 
 #endif //OPENGL_POC_APPS_BLOCK_H_

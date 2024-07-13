@@ -76,3 +76,15 @@ Block blockCreateSimple(
 
         return block;
 }
+
+int blockRenderUniformCallback(Sprite *sprite) {
+        float aspectRatio = sprite->width / sprite->height;
+        shaderSetFloat(sprite->shader, "textureAspectRatio", aspectRatio);
+
+        return EXIT_SUCCESS;
+}
+
+int blockRender(Block *p_block) {
+        spriteRender(&p_block->sprite, (Callback) blockRenderUniformCallback);
+        return EXIT_SUCCESS;
+}

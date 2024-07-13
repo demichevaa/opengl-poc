@@ -29,5 +29,7 @@ int shaderSetVec3f(ShaderProgram *shader, const char *uniformName, vec3 value);
 int shaderSetVec4f(ShaderProgram *shader, const char *uniformName, vec4 value);
 int shaderSetInt(const ShaderProgram *shader, const char *uniformName, int value);
 int shaderSetFloat(const ShaderProgram *shader, const char *uniformName, float value);
+int shaderSetVec2f(ShaderProgram *shader, const char *uniformName, vec2 value);
+
 
 #endif //OPENGL_POC_SRC_SHADER_H_

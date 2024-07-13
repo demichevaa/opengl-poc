@@ -46,7 +46,7 @@ int levelInitialize(Level *level, int rowsCount, int colsCount, int data[rowsCou
 int levelRender(Level *pLevel) {
         for (int i = 0; i < pLevel->rowsCount; ++i) {
                 for (int j = 0; j < pLevel->columnsCount; ++j) {
-                        spriteRender(&pLevel->blocks[i][j].sprite);
+                        blockRender(&pLevel->blocks[i][j]);
                 }
         }
 

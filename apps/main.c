@@ -1,48 +1,46 @@
 #include "window.h"
-#include "assets.h"
-#include "level.h"
 #include "game.h"
 
 float WINDOW_WIDTH = 1366;
 float WINDOW_HEIGHT = 768;
 
-//int LEVEL_1_DATA[7][13] = {
-//        {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,},
-//        {5, 5, 5, 5, 5, 1, 1, 1, 1, 1, 5, 5, 5, },
-//        {5, 2, 5, 2, 5, 1, 1, 2, 1, 1, 5, 2, 5, },
-//        {4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 4, 4, 4, },
-//        {4, 4, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, },
-//        {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, },
-//        {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, }
-//};
+void inputCallback(GLFWwindow* window, int key, int scancode, int action, int mode) {
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+                glfwSetWindowShouldClose(window, GL_TRUE);
+        Game *p_game = (Game*)glfwGetWindowUserPointer(window);
+
+        glfwGetTime();
+        if (p_game != NULL) {
+                gameHandleInput(p_game, key, action);
+        }
+}
+
 
 int main() {
         GLFWwindow *window = createWindow(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        Sprite sprite;
-        spriteCreateFromAssets(&sprite, "tst", "textures/block.png");
-
-        sprite.X = 100;
-        sprite.Y = 100;
-        spriteApplyModel(&sprite);
-//        Level level_1;
-//        levelInitialize(&level_1, 7, 13, LEVEL_1_DATA);
 
         Game game;
         gameInitialize(&game);
 
+        glfwSetWindowUserPointer(window, &game);
+        glfwSetKeyCallback(window, inputCallback);
+
+        float deltaTime = 0.0f;
+        float lastFrame = 0.0f;
         while (!glfwWindowShouldClose(window)) {
                 glfwPollEvents();
+                float currentFrame = glfwGetTime();
+                deltaTime = currentFrame - lastFrame;
+                lastFrame = currentFrame;
 
+                printf("%f\n", deltaTime);
                 glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
                 glClear(GL_COLOR_BUFFER_BIT);
 
-                gameLoop(&game);
-                //levelRender(&level_1);
-                //spriteRender(&sprite);
+                renderLoop(&game, deltaTime);
                 glfwSwapBuffers(window);
         }
 
-        spriteRelease(&sprite);
         return EXIT_SUCCESS;
 }

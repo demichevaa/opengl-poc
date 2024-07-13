@@ -69,7 +69,7 @@ GLFWwindow* windowInitialize(Window *p_window, char *title, float width, float h
         p_window->glfw_window = window;
 
 
-        windowRegisterInputCallback(inputCallback);
+        //windowRegisterInputCallback(inputCallback);
 
         return window;
 }
@@ -86,11 +86,6 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 }
 
 void tempDebugInputCallback(GLFWwindow* window, int key, int scancode, int action, int mode) {
-        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-                glfwSetWindowShouldClose(window, GL_TRUE);
-}
-
-void inputCallback(GLFWwindow* window, int key, int scancode, int action, int mode) {
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
                 glfwSetWindowShouldClose(window, GL_TRUE);
 }

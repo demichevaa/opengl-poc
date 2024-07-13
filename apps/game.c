@@ -22,17 +22,22 @@ int gameInitialize(Game *pGame) {
         pGame->background.height = 10;
         pGame->background.width = 10;
 
+        uiInitialize(&pGame->ui);
+
+        pGame->platform = platformCreate();
         pGame->level = level_1;
         pGame->state = GAME_ACTIVE;
 
         EXIT_SUCCESS;
 }
 
-int gameLoop(Game *pGame) {
-        switch (pGame->state) {
+int renderLoop(Game *p_game, float timeDelta) {
+        switch (p_game->state) {
                 case GAME_ACTIVE:
-                        spriteRender(&pGame->background);
-                        levelRender(&pGame->level);
+                        //spriteRender(&pGame->background, NULL);
+                        uiRender(&p_game->ui);
+                        levelRender(&p_game->level);
+                        platformRender(&p_game->platform, timeDelta);
 
                         break;
                 case GAME_MENU:
@@ -44,3 +49,7 @@ int gameLoop(Game *pGame) {
         EXIT_SUCCESS;
 }
 
+int gameHandleInput(Game *p_game, int key, int action) {
+        platformHandleInput(&p_game->platform, key, action);
+        return EXIT_SUCCESS;
+}

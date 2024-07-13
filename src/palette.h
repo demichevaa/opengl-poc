@@ -6,18 +6,31 @@
 typedef struct {
     vec4 transparent;
     vec4 sandyBrown;
+    /* Orange */
     vec4 outrageousOrange;
+    /* Red */
     vec4 fireBrick;
+    /* Dark grey */
     vec4 nevada;
+    /* White grey */
     vec4 sandrift;
+    /* Green */
     vec4 fruitSalad;
+    /* Dark green */
     vec4 goblin;
+    /* Dark color */
     vec4 cabSav;
+    /* Sick blue */
     vec4 allports;
+    /* Blue x green */
     vec4 keppel;
+    /* Light Grey */
     vec4 zanah;
+    /* Yellowish white */
     vec4 cherokee;
+    /* Gold */
     vec4 goldTips;
+    /* Orange brown */
     vec4 smokeTree;
 
 } ColorsPalette;
