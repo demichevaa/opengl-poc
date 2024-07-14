@@ -1,10 +1,12 @@
 #version 330 core
 
-in vec2 vVertex;
-out vec4 fColor;
+uniform sampler2D uTexture;
+uniform vec4 uColor;
 
-uniform sampler2D ourTexture;
-uniform vec4 spriteColor;
+in vec2 vVertex;
+
+out vec4 fTexelColor;
+
 
 void main()
 {
@@ -12,8 +14,8 @@ void main()
     float distance = distance(vVertex, bottomCenter);
     float gradient = clamp(distance * 2.0, 0.0, 1.0);
 
-    vec4 textureColor = texture(ourTexture, vVertex);
-    vec3 blendedColor = mix(textureColor.rgb, spriteColor.rgb, gradient);
-    fColor = vec4(blendedColor, textureColor.a);
+    vec4 textureColor = texture(uTexture, vVertex);
+    vec3 blendedColor = mix(textureColor.rgb, uColor.rgb, gradient);
+    fTexelColor = vec4(blendedColor, textureColor.a);
     //color.rgb *= (vVertex.x * vVertex.y);
 }

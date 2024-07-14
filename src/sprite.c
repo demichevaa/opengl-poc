@@ -77,8 +77,9 @@ int spriteRender(Sprite *sprite, Callback callback) {
                 callback(sprite);
         }
         spriteApplyModel(sprite);
-        shaderSetMat4(sprite->shader, "MVP", &sprite->MVP);
-        shaderSetVec4f(sprite->shader, "spriteColor", sprite->color);
+        shaderSetMat4(sprite->shader, "uMVP", &sprite->MVP);
+        shaderSetVec4f(sprite->shader, "uColor", sprite->color);
+        shaderSetInt(sprite->shader, "uTexture", 0);
 
         glBindVertexArray(sprite->VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

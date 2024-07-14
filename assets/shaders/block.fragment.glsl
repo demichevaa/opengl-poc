@@ -1,25 +1,28 @@
 #version 330 core
 
-in vec2 TexCoords;
-out vec4 color;
-uniform sampler2D ourTexture;
-uniform vec4 spriteColor;
-uniform float textureAspectRatio;
+uniform sampler2D uTexture;
+uniform vec4 uColor;
+uniform float uTextureAspectRatio;
+
+in vec2 vVertex;
+
+out vec4 fTexelColor;
+
 
 void main()
 {
     vec4 borderColor = vec4(0.65, 0.61, 0.60, 1.0);
     float borderWidth = 0.02f;
 
-    bool isLeftBorder = TexCoords.x < borderWidth;
-    bool isRightBorder = TexCoords.x > 1.0 - borderWidth;
-    bool isTopBorder = TexCoords.y > 1.0 - borderWidth * textureAspectRatio;
-    bool isBottomBorder = TexCoords.y < borderWidth * textureAspectRatio;
+    bool isLeftBorder = vVertex.x < borderWidth;
+    bool isRightBorder = vVertex.x > 1.0 - borderWidth;
+    bool isTopBorder = vVertex.y > 1.0 - borderWidth * uTextureAspectRatio;
+    bool isBottomBorder = vVertex.y < borderWidth * uTextureAspectRatio;
 
     if (isLeftBorder || isRightBorder || isTopBorder || isBottomBorder) {
-        color = borderColor;
+        fTexelColor = borderColor;
     }
     else {
-        color = spriteColor * texture(ourTexture, TexCoords);
+        fTexelColor = uColor * texture(uTexture, vVertex);
     }
 }
