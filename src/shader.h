@@ -13,6 +13,9 @@ typedef struct ShaderProgram {
         const char *vertexSource;
         const char *fragmentSource;
         const char *geometrySource;
+        const char *vertexSourcePath;
+        const char *fragmentSourcePath;
+        const char *geometrySourcePath;
 } ShaderProgram;
 
 int shaderProgramInitialize(ShaderProgram *program,

@@ -70,10 +70,15 @@ int shaderCreateFromAssets(ShaderProgram *shader,
                 geometrySource = assetGetContent(geometryAssetRelativePath);
         }
 
+
         shaderProgramInitialize(shader,
                                 vertexSource,
                                 fragmentSource,
                                 geometrySource);
+        shader->vertexSourcePath = vertexAssetRelativePath;
+        shader->fragmentSourcePath = fragmentAssetRelativePath;
+        shader->geometrySourcePath = geometryAssetRelativePath;
+
         shaderProgramCompile(shader);
 
         printf(

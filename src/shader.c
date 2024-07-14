@@ -1,7 +1,7 @@
 #include "shader.h"
 
-void shaderHandleErrors(unsigned int shader);
-void shaderProgramHandleErrors(unsigned int program);
+void shaderHandleErrors(const ShaderProgram *p_shaderProgram, int type, unsigned int shader);
+void shaderProgramHandleErrors(const ShaderProgram *p_shaderProgram);
 
 int shaderProgramInitialize(
     ShaderProgram *program,
@@ -33,11 +33,12 @@ int shaderProgramCompile(const ShaderProgram *program) {
         unsigned int sVertex, sFragment, sGeometry;
         bool hasGeometry = program->geometrySource != NULL;
 
+
         if (hasGeometry) {
                 sGeometry = glCreateShader(GL_GEOMETRY_SHADER);
                 glShaderSource(sGeometry, 1, &program->geometrySource, NULL);
                 glCompileShader(sGeometry);
-                shaderHandleErrors(sGeometry);
+                shaderHandleErrors(program, 3,sGeometry);
 
                 glAttachShader(program->id, sGeometry);
         }
@@ -45,19 +46,19 @@ int shaderProgramCompile(const ShaderProgram *program) {
         sVertex = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(sVertex, 1, &program->vertexSource, NULL);
         glCompileShader(sVertex);
-        shaderHandleErrors(sVertex);
+        shaderHandleErrors(program, 1, sVertex);
         glAttachShader(program->id, sVertex);
 
 
         sFragment = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(sFragment, 1, &program->fragmentSource, NULL);
         glCompileShader(sFragment);
-        shaderHandleErrors(sFragment);
+        shaderHandleErrors(program, 2,sFragment);
         glAttachShader(program->id, sFragment);
 
         glLinkProgram(program->id);
 
-        shaderProgramHandleErrors(program->id);
+        shaderProgramHandleErrors(program);
 
         glDeleteShader(sVertex);
         glDeleteShader(sFragment);
@@ -69,7 +70,7 @@ int shaderProgramCompile(const ShaderProgram *program) {
         return EXIT_SUCCESS;
 }
 
-void shaderHandleErrors(unsigned int shader) {
+void shaderHandleErrors(const ShaderProgram *p_shaderProgram, int type, unsigned int shader) {
         int success;
         char infoLog[1024];
 
@@ -77,19 +78,34 @@ void shaderHandleErrors(unsigned int shader) {
 
         if (!success) {
                 glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-                fprintf(stderr, "ERROR::Shader::Compile:\n%s", infoLog);
+
+                const char *source;
+                switch (type) {
+                        case 1:
+                                source = p_shaderProgram->vertexSource;
+                                break;
+                        case 2:
+                                source = p_shaderProgram->fragmentSource;
+                                break;
+                        case 3:
+                                source = p_shaderProgram->geometrySource;
+                                break;
+                        default:
+                                break;
+                }
+                fprintf(stderr, "[SHADER] -> Compile error\nInfo Log:\n%s\nSource:\n%s\n", infoLog, source);
                 exit(EXIT_FAILURE);
         }
 }
-void shaderProgramHandleErrors(unsigned int program) {
+void shaderProgramHandleErrors(const ShaderProgram *p_shaderProgram) {
         int success;
         char infoLog[1024];
 
-        glGetProgramiv(program, GL_LINK_STATUS, &success);
+        glGetProgramiv(p_shaderProgram->id, GL_LINK_STATUS, &success);
 
         if (!success) {
-                glGetProgramInfoLog(program, 1024, NULL, infoLog);
-                fprintf(stderr, "ERROR::Shader::Linking:\n%s", infoLog);
+                glGetProgramInfoLog(p_shaderProgram->id, 1024, NULL, infoLog);
+                fprintf(stderr, "[SHADER] -> Linking error:\n%s", infoLog);
                 exit(EXIT_FAILURE);
         }
 }
@@ -100,8 +116,8 @@ int uniformGetLocation(int *location,
         *location = (int)glGetUniformLocation(shader->id, uniformName);
         if (*location == -1) {
                 fprintf(stderr,
-                        "[SHADER:UNIFORM] -> Uniform parameter `%s` not found",
-                        uniformName);
+                        "[SHADER:UNIFORM] -> Uniform parameter `%s` not found:\n%s\n%s\n%s\n",
+                        uniformName, shader->vertexSourcePath, shader->fragmentSourcePath, shader->geometrySourcePath);
                 exit(EXIT_FAILURE);
         }
 
