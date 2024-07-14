@@ -37,7 +37,7 @@ int uiInitialize(UI *p_ui) {
 int backgroundUniformCallback(Sprite *sprite) {
         vec2 repeat = {VIEWPORT_WIDTH / 10, VIEWPORT_HEIGHT / 10};
 
-        shaderSetVec2f(sprite->shader, "repeatFactor", repeat);
+        shaderSetVec2f(sprite->shader, "uRepeatFactor", repeat);
 
         return EXIT_SUCCESS;
 }
