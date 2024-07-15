@@ -14,5 +14,8 @@ void main()
     vec4 texel = texture(uTexture, vVertex);
     vec3 blendedColor = mix(texel.rgb, uColor.rgb, 0.9);
     fTexelColor = vec4(blendedColor, texel.a);
-    fTexelColor.rgb *= 1 - vVertex.y * 0.15;
+
+    float gradientStartFromY = 0.3;
+    float gradientIntensity = 0.15;
+    fTexelColor.rgb *= gradientStartFromY + 1 - vVertex.y * gradientIntensity;
 }

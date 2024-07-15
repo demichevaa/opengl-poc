@@ -149,3 +149,10 @@ int spriteApplyModel(Sprite *sprite) {
 
         return EXIT_SUCCESS;
 }
+
+int spriteSetPosition(Sprite *p_sprite, const vec2 centeredPosition) {
+        p_sprite->X = centeredPosition[0] - p_sprite->width / 2.0f;
+        p_sprite->Y = centeredPosition[1] - p_sprite->height / 2.0f;
+
+        return EXIT_SUCCESS;
+}

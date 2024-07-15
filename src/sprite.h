@@ -39,6 +39,7 @@ int spriteRelease(Sprite *sprite);
 int spriteSetPosition(Sprite *sprite, const vec2 position);
 int spriteSetScale(Sprite *sprite, vec2 scale);
 int spriteSetRotationAngle(Sprite *sprite, float angle);
+int spriteSetPosition(Sprite *p_sprite, const vec2 centeredPosition);
 int spriteApplyModel(Sprite *sprite);
 
 

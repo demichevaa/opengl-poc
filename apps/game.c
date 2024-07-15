@@ -10,10 +10,6 @@ int LEVEL_1_DATA[7][13] = {
         {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, }
 };
 
-int backgroundInitialize() {
-
-}
-
 int gameInitialize(Game *pGame) {
         Level level_1;
         levelInitialize(&level_1, 7, 13, LEVEL_1_DATA);
@@ -25,20 +21,33 @@ int gameInitialize(Game *pGame) {
         uiInitialize(&pGame->ui);
 
         pGame->platform = platformCreate();
+        pGame->ball = ballCreate();
         pGame->level = level_1;
         pGame->state = GAME_ACTIVE;
+
 
         EXIT_SUCCESS;
 }
 
-int renderLoop(Game *p_game, float timeDelta) {
+
+enum Actions getAction(GLFWwindow *p_window) {
+        if (glfwGetKey(p_window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+                return LEFT;
+        }
+        if (glfwGetKey(p_window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+                return RIGHT;
+        }
+        return IDLE;
+}
+
+int gameLoop(Game *p_game, GLFWwindow *p_window, float timeDelta) {
         switch (p_game->state) {
                 case GAME_ACTIVE:
-                        //spriteRender(&pGame->background, NULL);
+                        gameHandleInput(p_game, getAction(p_window), timeDelta);
                         uiRender(&p_game->ui);
                         levelRender(&p_game->level);
                         platformRender(&p_game->platform, timeDelta);
-
+                        ballRender(&p_game->ball, timeDelta);
                         break;
                 case GAME_MENU:
                 case GAME_WIN:
@@ -49,7 +58,7 @@ int renderLoop(Game *p_game, float timeDelta) {
         EXIT_SUCCESS;
 }
 
-int gameHandleInput(Game *p_game, int key, int action) {
-        platformHandleInput(&p_game->platform, key, action);
+int gameHandleInput(Game *p_game, enum Actions action, float timeDelta) {
+        platformHandleInput(&p_game->platform, action, timeDelta);
         return EXIT_SUCCESS;
 }

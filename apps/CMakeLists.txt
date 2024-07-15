@@ -10,5 +10,7 @@ add_executable(opengl-poc-app
         main.c
         platform.c
         platform.h
+        ball.c
+        ball.h
 )
 target_link_libraries(opengl-poc-app ${GLIB_LIBRARIES} glad glfw opengl-poc-lib)

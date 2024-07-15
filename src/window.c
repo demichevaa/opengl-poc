@@ -16,8 +16,15 @@ GLFWwindow* createWindow(float width, float height) {
         gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
         glViewport(0, 0, (int) width, (int) height);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 
         glfwSetKeyCallback(window, inputCallback);
+
+        glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
 
 
         return window;
@@ -41,6 +48,7 @@ GLFWwindow* windowInitialize(Window *p_window, char *title, float width, float h
         }
         glfwMakeContextCurrent(window);
         //glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
                 fprintf(stderr, "Failed to initialize GLAD\n");
@@ -86,6 +94,11 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 }
 
 void tempDebugInputCallback(GLFWwindow* window, int key, int scancode, int action, int mode) {
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+                glfwSetWindowShouldClose(window, GL_TRUE);
+}
+
+void inputCallback(GLFWwindow* window, int key, int scancode, int action, int mode) {
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
                 glfwSetWindowShouldClose(window, GL_TRUE);
 }
