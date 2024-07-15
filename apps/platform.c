@@ -14,42 +14,38 @@ struct Platform platformCreate() {
         platform.sprite.width = platform.size;
         platform.sprite.height = 3;
 
-        platform.x = VIEWPORT_WIDTH / 2;
-        platform.y = 2.0f;
+        platform.position[0] = VIEWPORT_WIDTH / 2;
+        platform.position[1] = 2.0f;
         platform.velocity = 35.0f;
 
         return platform;
 }
 
 int platformRender(struct Platform *p_platform, float timeDelta) {
-        float centerAdjustment = p_platform->sprite.width / 2.0f;
-        p_platform->sprite.X = (p_platform->x - centerAdjustment);
-
-        spriteSetPosition(&p_platform->sprite, (vec2){p_platform->x, p_platform->y});
+        spriteSetPosition(&p_platform->sprite, p_platform->position);
         spriteRender(&p_platform->sprite, NULL);
 
         return EXIT_SUCCESS;
 }
 
 int platformHandleInput(struct Platform *p_platform, enum Actions action, float timeDelta) {
-        float edgeDistance = p_platform->size / 2.0f;
-
         switch (action) {
                 case LEFT:
-                        if (p_platform->x - edgeDistance > VIEWPORT_ORIGIN) {
-                                p_platform->x -= p_platform->velocity * timeDelta;
-                        }
+                        p_platform->position[0] -= p_platform->velocity * timeDelta;
+
                         break;
 
                 case RIGHT:
-                        if (p_platform->x + edgeDistance < VIEWPORT_WIDTH) {
-                                p_platform->x += p_platform->velocity * timeDelta;
-                        }
+                        p_platform->position[0] += p_platform->velocity * timeDelta;
+
                         break;
 
                 default:
                         break;
         }
+
+        clampToViewport(p_platform->position, p_platform->sprite.width, p_platform->sprite.height);
+
 
         return EXIT_SUCCESS;
 }

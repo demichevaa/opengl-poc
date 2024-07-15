@@ -8,8 +8,9 @@
 
 struct Platform {
     Sprite sprite;
-    float x;
-    float y;
+    vec2 position;
+//    float x;
+//    float y;
     float velocity;
     float size;
 };

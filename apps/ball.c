@@ -39,7 +39,6 @@ int ballProcess(struct Ball *p_ball, float timeDelta) {
 
 int ballRender(struct Ball *p_ball, float timeDelta) {
         ballProcess(p_ball, timeDelta);
-
         spriteSetPosition(&p_ball->sprite, p_ball->position);
         spriteRender(&p_ball->sprite, NULL);
 
