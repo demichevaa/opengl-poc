@@ -149,7 +149,7 @@ int sprite_apply_model(struct Sprite *p_sprite) {
         return EXIT_SUCCESS;
 }
 
-int spriteSetPosition(struct Sprite *p_sprite, const vec2 centeredPosition) {
+int sprite_set_position(struct Sprite *p_sprite, const vec2 centeredPosition) {
         p_sprite->X = centeredPosition[0] - p_sprite->width / 2.0f;
         p_sprite->Y = centeredPosition[1] - p_sprite->height / 2.0f;
 

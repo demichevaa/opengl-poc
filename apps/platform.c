@@ -22,7 +22,7 @@ struct Platform platform_create() {
 }
 
 int platform_render(struct Platform *p_platform, float time_delta) {
-        spriteSetPosition(&p_platform->sprite, p_platform->position);
+        sprite_set_position(&p_platform->sprite, p_platform->position);
         sprite_render(&p_platform->sprite, NULL);
 
         return EXIT_SUCCESS;

@@ -36,7 +36,7 @@ int ball_update(struct Ball *p_ball, float time_delta) {
 }
 
 int ball_render(struct Ball *p_ball, float time_delta) {
-        spriteSetPosition(&p_ball->sprite, p_ball->position);
+        sprite_set_position(&p_ball->sprite, p_ball->position);
         sprite_render(&p_ball->sprite, NULL);
 
         return EXIT_SUCCESS;
