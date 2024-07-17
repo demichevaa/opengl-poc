@@ -1,98 +1,60 @@
 #include "block.h"
-#include "ball.h"
 
 
-int assignDecodedColor(vec4 color, enum BlockType colorCode) {
-        switch (colorCode) {
-                case WALL: {
-                        glm_vec4_copy((float *) &PALETTE.cabSav, color);
-                        break;
-                }
-                case HP_1: {
-                        glm_vec4_copy((float *) &PALETTE.goldTips, color);
-                        break;
-                }
-                case HP_2: {
-                        glm_vec4_copy((float *) &PALETTE.sandyBrown, color);
-                        break;
-                }
-                case HP_3: {
-                        glm_vec4_copy((float *) &PALETTE.outrageousOrange, color);
-                        break;
-                }
-                case HP_4: {
-                        glm_vec4_copy((float *) &PALETTE.fireBrick, color);
-                        break;
-                }
-                case HP_5: {
-                        glm_vec4_copy((float *) &PALETTE.cherokee, color);
-                        break;
-                }
-                default: {
-                        fprintf(stderr, "[LEVEL:INITIALIZE] -> Unknown color code %d\n", colorCode);
-                        glm_vec4_copy((float *) &PALETTE.transparent, color);
-                        return EXIT_FAILURE;
-                }
-        }
 
-        return EXIT_SUCCESS;
-}
+int block_set_color(struct Block *p_block, enum BlockType color_code);
 
-
-Block blockCreateSimple(
+Block block_create(
         float width,
         float height,
         float X,
         float Y,
         enum BlockType type,
         unsigned int hp,
-        bool isDestroyable
+        bool is_destroyable
 ) {
-        ShaderProgram *program = malloc(sizeof(ShaderProgram));
-        shaderCreateFromAssets(program, "shaders/block.vertex.glsl", "shaders/block.fragment.glsl", NULL);
+        struct ShaderProgram *shader = malloc(sizeof(struct ShaderProgram));
+        shader_create_from_assets(shader, "shaders/block.vertex.glsl", "shaders/block.fragment.glsl", NULL);
 
-        Texture2D *texture = malloc(sizeof(Texture2D));
+        struct Texture2D *texture = malloc(sizeof(struct Texture2D));
         if (type == WALL) {
-                textureCreateFromAssets(texture,  "textures/block_solid.png");
+                texture_create_from_assets(texture, "textures/block_solid.png");
         }
         else {
-                textureCreateFromAssets(texture,  "textures/block.png");
+                texture_create_from_assets(texture, "textures/block.png");
         }
 
         Block block;
-        spriteInitialize(&block.sprite, "block", program, texture);
+        sprite_initialize(&block.sprite, shader, texture);
 
-        //Sprite sprite;
         block.sprite.width = width;
         block.sprite.height = height;
-        //block.sprite = sprite;
         block.sprite.X = X;
         block.sprite.Y = Y;
         block.is_dead = false;
 
-        assignDecodedColor(block.sprite.color, type);
+        block_set_color(&block, type);
 
-        if (isDestroyable) {
+        if (is_destroyable) {
                 block.health = 0;
         }
 
         return block;
 }
 
-int blockRenderUniformCallback(Sprite *sprite) {
-        float aspectRatio = sprite->width / sprite->height;
-        shaderSetFloat(sprite->shader, "uTextureAspectRatio", aspectRatio);
+int block_render_uniform_callback(struct Sprite *p_sprite) {
+        float aspect_ratio = p_sprite->width / p_sprite->height;
+        shaderSetFloat(p_sprite->p_shader, "uTextureAspectRatio", aspect_ratio);
 
         return EXIT_SUCCESS;
 }
 
-int blockRender(Block *p_block) {
+int block_render(Block *p_block) {
         if (p_block->is_dead) {
                 return EXIT_SUCCESS;
         }
 
-        spriteRender(&p_block->sprite, (Callback) blockRenderUniformCallback);
-        return EXIT_SUCCESS;
+        return sprite_render(&p_block->sprite, (Callback) block_render_uniform_callback);
 }
 
 int block_on_hit(Block *p_block, struct Ball *p_ball) {
@@ -103,8 +65,44 @@ int block_on_hit(Block *p_block, struct Ball *p_ball) {
         if (p_block->health <= 0) {
                 p_block->is_dead = true;
                 printf("[BLOCK:DESTROYED] -> Destroying block. Hp: %i is_dead %i\n", p_block->health, p_block->is_dead);
+                sprite_free(&p_block->sprite);
+        }
 
-                //spriteRelease(&p_block->sprite);
+        return EXIT_SUCCESS;
+}
+
+
+int block_set_color(struct Block *p_block, enum BlockType color_code) {
+        switch (color_code) {
+                case WALL: {
+                        glm_vec4_copy((float *) &PALETTE.cabSav, p_block->sprite.color);
+                        break;
+                }
+                case HP_1: {
+                        glm_vec4_copy((float *) &PALETTE.goldTips, p_block->sprite.color);
+                        break;
+                }
+                case HP_2: {
+                        glm_vec4_copy((float *) &PALETTE.sandyBrown, p_block->sprite.color);
+                        break;
+                }
+                case HP_3: {
+                        glm_vec4_copy((float *) &PALETTE.outrageousOrange, p_block->sprite.color);
+                        break;
+                }
+                case HP_4: {
+                        glm_vec4_copy((float *) &PALETTE.fireBrick, p_block->sprite.color);
+                        break;
+                }
+                case HP_5: {
+                        glm_vec4_copy((float *) &PALETTE.cherokee, p_block->sprite.color);
+                        break;
+                }
+                default: {
+                        fprintf(stderr, "[LEVEL:INITIALIZE] -> Unknown color code %d\n", color_code);
+                        glm_vec4_copy((float *) &PALETTE.transparent, p_block->sprite.color);
+                        return EXIT_FAILURE;
+                }
         }
 
         return EXIT_SUCCESS;

@@ -4,6 +4,6 @@
 #include "sprite.h"
 
 
-int collision_check_ABBB(Sprite *p_a, Sprite *p_b);
+int collision_check_ABBB(struct Sprite *p_a, struct Sprite *p_b);
 
 #endif //OPENGL_POC_COLLISION_H

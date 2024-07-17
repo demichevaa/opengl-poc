@@ -11,15 +11,15 @@
 #include "debug.h"
 
 
-typedef struct Texture2D {
+struct Texture2D {
         unsigned int id;
         GLenum format;
         const char *source;
         int width;
         int height;
-} Texture2D;
+};
 
-int textureInitialize(Texture2D *texture, int width, int height, const unsigned char *data);
-int textureBind(Texture2D *texture);
+int texture_initialize(struct Texture2D *p_texture, int width, int height, const unsigned char *str_data);
+int texture_bind(struct Texture2D *p_texture);
 
 #endif //OPENGL_POC_SRC_TEXTURE_H_

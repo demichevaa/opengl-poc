@@ -28,8 +28,8 @@ void mat4_mul(mat4 a, mat4 b, mat4 result) {
 }
 
 struct Render {
-    ShaderProgram *shaderProgram;
-    Texture2D *texture;
+    struct ShaderProgram *shaderProgram;
+    struct Texture2D *texture;
 
     mat4 MVP;
     unsigned int VAO;
@@ -85,7 +85,7 @@ int renderApplyModel(
 }
 
 
-int renderInitialize(struct Render *p_render, ShaderProgram *p_shaderProgram, Texture2D *p_texture) {
+int renderInitialize(struct Render *p_render, struct ShaderProgram *p_shaderProgram, struct Texture2D *p_texture) {
         GLuint VBO, VAO, EBO;
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);

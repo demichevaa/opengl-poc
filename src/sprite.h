@@ -13,10 +13,9 @@
 #include "common.h"
 
 
-typedef struct Sprite {
-        const char *tag;
-        ShaderProgram *shader;
-        Texture2D *texture;
+struct Sprite {
+        struct ShaderProgram *p_shader;
+        struct Texture2D *p_texture;
 
         float X;
         float Y;
@@ -30,17 +29,16 @@ typedef struct Sprite {
         unsigned int VBO;
         unsigned int EBO;
 
-} Sprite;
+};
 
 
-int spriteInitialize(Sprite *sprite, const char *tag, ShaderProgram *shader, Texture2D *texture);
-int spriteRender(Sprite *sprite, Callback callback);
-int spriteRelease(Sprite *sprite);
-int spriteSetPosition(Sprite *sprite, const vec2 position);
-int spriteSetScale(Sprite *sprite, vec2 scale);
-int spriteSetRotationAngle(Sprite *sprite, float angle);
-int spriteSetPosition(Sprite *p_sprite, const vec2 centeredPosition);
-int spriteApplyModel(Sprite *sprite);
+int sprite_initialize(struct Sprite *p_sprite, struct ShaderProgram *p_shader, struct Texture2D *p_texture);
+int sprite_render(struct Sprite *p_sprite, Callback callback);
+int sprite_free(struct Sprite *p_sprite);
+int sprite_set_scale(struct Sprite *p_sprite, vec2 scale);
+int sprite_set_rotation_angle(struct Sprite *p_sprite, float angle);
+int sprite_set_position(struct Sprite *p_sprite, const vec2 centered_position);
+int sprite_apply_model(struct Sprite *p_sprite);
 
 
 

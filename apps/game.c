@@ -10,25 +10,22 @@ int LEVEL_1_DATA[7][13] = {
         {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, }
 };
 
-int game_detect_collisions(Game *p_game);
-typedef int (*LevelCallback)(Block *p_block, struct Ball *p_ball);
-int level_for_each_active_block(Level *p_level, Callback callback);
-int debug_callback(void *context);
+int game_detect_collisions(struct GameState *p_state);
+typedef int (*LevelCallback)(struct GameState *p_state, struct Block *p_block);
+int game_for_each_active_block(struct GameState *p_state, LevelCallback handleBlock);
+int handle_ball_collision(struct GameState *p_state, struct Block *p_block);
 
-int gameInitialize(Game *pGame) {
-        Level level_1;
-        levelInitialize(&level_1, 7, 13, LEVEL_1_DATA);
+int game_initialize(struct GameState *p_state) {
+        struct Level level_1;
+        level_initialize(&level_1, 7, 13, LEVEL_1_DATA);
 
-        spriteCreateFromAssets(&pGame->background, "background", "textures/black_background_56.png");
-        pGame->background.height = 10;
-        pGame->background.width = 10;
 
-        uiInitialize(&pGame->ui);
+        ui_initialize(&p_state->ui);
 
-        pGame->platform = platformCreate();
-        pGame->ball = ballCreate();
-        pGame->level = level_1;
-        pGame->state = GAME_ACTIVE;
+        p_state->platform = platform_create();
+        p_state->ball = ball_create();
+        p_state->level = level_1;
+        p_state->status = GAME_ACTIVE;
 
         EXIT_SUCCESS;
 }
@@ -45,16 +42,20 @@ enum Actions get_player_action(GLFWwindow *p_window) {
 }
 
 
-int game_loop(Game *p_game, GLFWwindow *p_window, float timeDelta) {
-        switch (p_game->state) {
+int game_loop(struct GameState *p_state, GLFWwindow *p_window, float time_delta) {
+        switch (p_state->status) {
                 case GAME_ACTIVE:
-                        game_handle_input(p_game, get_player_action(p_window), timeDelta);
-                        uiRender(&p_game->ui);
-                        levelRender(&p_game->level);
+                        game_handle_input(p_state, get_player_action(p_window), time_delta);
+                        ball_update(&p_state->ball, time_delta);
 
-                        platformRender(&p_game->platform, timeDelta);
-                        ballRender(&p_game->ball, timeDelta);
-                        game_detect_collisions(p_game);
+
+                        ui_render(&p_state->ui);
+                        level_render(&p_state->level);
+                        platform_render(&p_state->platform, time_delta);
+                        ball_render(&p_state->ball, time_delta);
+
+
+                        game_detect_collisions(p_state);
 
                         break;
                 case GAME_MENU:
@@ -66,84 +67,53 @@ int game_loop(Game *p_game, GLFWwindow *p_window, float timeDelta) {
         EXIT_SUCCESS;
 }
 
-int game_handle_input(Game *p_game, enum Actions action, float time_delta) {
-        platformHandleInput(&p_game->platform, action, time_delta);
+int game_handle_input(struct GameState *p_state, enum Actions action, float time_delta) {
+        platform_handle_input(&p_state->platform, action, time_delta);
 
         return EXIT_SUCCESS;
 }
 
-
-int game_detect_collisions(Game *p_game) {
-        bool is_platform_hit = collision_check_ABBB(&p_game->platform.sprite, &p_game->ball.sprite);
+int game_detect_collisions(struct GameState *p_state) {
+        bool is_platform_hit = collision_check_ABBB(&p_state->platform.sprite, &p_state->ball.sprite);
 
         if (is_platform_hit) {
-                direction_invert(p_game->ball.direction);
+                direction_invert(p_state->ball.direction);
                 return EXIT_SUCCESS;
         }
 
-        //level_for_each_active_block(&p_game->level, debug_callback);
-
-//        Level *p_level = &p_game->level;
-//        for (int i = 0; i < p_level->rowsCount; ++i) {
-//                for (int j = 0; j < p_level->columnsCount; ++j) {
-//                        Block *p_block = &p_level->blocks[i][j];
-//
-//                        if (p_block == NULL || p_block->is_dead) {
-//                                continue;
-//                        }
-//
-//                        bool is_block_hit = collision_check_ABBB(&p_block->sprite, &p_game->ball.sprite);
-//                        if (is_block_hit) {
-//                                block_on_hit(p_block, &p_game->ball);
-//                                break;
-//                        }
-//                }
-//
-//        }
-
+        game_for_each_active_block(p_state, handle_ball_collision);
         return EXIT_SUCCESS;
 }
 
-int debug_callback(void *context) {
-        has_collision = collision_check_ABBB(&p_block->sprite, &p_game->ball.sprite);
-        printf("Callback\n");
+int handle_ball_collision(struct GameState *p_state, struct Block *p_block) {
+        bool is_block_hit = collision_check_ABBB(&p_block->sprite, &p_state->ball.sprite);
+        if (is_block_hit) {
+                block_on_hit(p_block, &p_state->ball);
+                return EXIT_SUCCESS;
+        }
 
-        return EXIT_SUCCESS;
+        return EXIT_FAILURE;
 }
 
-int level_for_each_active_block(Level *p_level,  LevelCallback callback) {
-        if (callback == NULL) {
+int game_for_each_active_block(struct GameState *p_state, LevelCallback handleBlock) {
+        if (handleBlock == NULL) {
                 return EXIT_FAILURE;
         }
 
-        //bool has_collision = false;
-        bool has_result = false;
-        for (int i = 0; i < p_level->rowsCount; ++i) {
-                for (int j = 0; j < p_level->columnsCount; ++j) {
+        struct Level *p_level = &p_state->level;
+
+        for (int i = 0; i < p_level->rows_count; ++i) {
+                for (int j = 0; j < p_level->columns_count; ++j) {
                         Block *p_block = &p_level->blocks[i][j];
-                        bool is_destroyed = p_block == NULL || p_block->is_dead;
-                        if (is_destroyed) {
+                        if (p_block == NULL || p_block->is_dead) {
                                 continue;
                         }
 
-                        has_result = callback(p_block, );
-                        if (has_result) {
-                                break;
+                        if (handleBlock(p_state, p_block) == EXIT_SUCCESS) {
+                                return EXIT_SUCCESS;
                         }
-//                        has_collision = collision_check_ABBB(&p_block->sprite, &p_game->ball.sprite);
-//                        if (has_collision) {
-//                                block_on_hit(p_block, &p_game->ball);
-//                                break;
-//                        }
                 }
-
-                if (has_result) {
-                        break;
-                }
-
         }
-
-
         return EXIT_SUCCESS;
 }
 

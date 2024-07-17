@@ -1,64 +1,64 @@
 #include "shader.h"
 
-void shaderHandleErrors(const ShaderProgram *p_shaderProgram, int type, unsigned int shader);
-void shaderProgramHandleErrors(const ShaderProgram *p_shaderProgram);
+void shaderHandleErrors(struct ShaderProgram *p_shader, int type, unsigned int shader);
+void shaderProgramHandleErrors(struct ShaderProgram *p_shader);
 
-int shaderProgramInitialize(
-    ShaderProgram *program,
-    const char *vertexSource,
-    const char *fragmentSource,
-    const char *geometrySource
+int shader_initialize(
+    struct ShaderProgram *shader,
+    const char *str_vertex_source,
+    const char *str_fragment_source,
+    const char *str_geometry_source
 ) {
-        program->vertexSource = vertexSource;
-        program->fragmentSource = fragmentSource;
-        program->geometrySource = geometrySource;
-        program->id = glCreateProgram();
+        shader->str_vertex_source = str_vertex_source;
+        shader->str_fragment_source = str_fragment_source;
+        shader->str_geometry_source = str_geometry_source;
+        shader->id = glCreateProgram();
 
         return EXIT_SUCCESS;
 }
 
-int shaderProgramUse(const ShaderProgram *program) {
-        glUseProgram(program->id);
+int shader_use(struct ShaderProgram *p_shader) {
+        glUseProgram(p_shader->id);
 
         return EXIT_SUCCESS;
 }
 
-int shaderProgramDelete(const ShaderProgram *program) {
-        glDeleteProgram(program->id);
+int shader_delete_program(struct ShaderProgram *p_shader) {
+        glDeleteProgram(p_shader->id);
 
         return EXIT_SUCCESS;
 }
 
-int shaderProgramCompile(const ShaderProgram *program) {
+int shader_compile(struct ShaderProgram *p_shader) {
         unsigned int sVertex, sFragment, sGeometry;
-        bool hasGeometry = program->geometrySource != NULL;
+        bool hasGeometry = p_shader->str_geometry_source != NULL;
 
 
         if (hasGeometry) {
                 sGeometry = glCreateShader(GL_GEOMETRY_SHADER);
-                glShaderSource(sGeometry, 1, &program->geometrySource, NULL);
+                glShaderSource(sGeometry, 1, &p_shader->str_geometry_source, NULL);
                 glCompileShader(sGeometry);
-                shaderHandleErrors(program, 3,sGeometry);
+                shaderHandleErrors(p_shader, 3,sGeometry);
 
-                glAttachShader(program->id, sGeometry);
+                glAttachShader(p_shader->id, sGeometry);
         }
 
         sVertex = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(sVertex, 1, &program->vertexSource, NULL);
+        glShaderSource(sVertex, 1, &p_shader->str_vertex_source, NULL);
         glCompileShader(sVertex);
-        shaderHandleErrors(program, 1, sVertex);
-        glAttachShader(program->id, sVertex);
+        shaderHandleErrors(p_shader, 1, sVertex);
+        glAttachShader(p_shader->id, sVertex);
 
 
         sFragment = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(sFragment, 1, &program->fragmentSource, NULL);
+        glShaderSource(sFragment, 1, &p_shader->str_fragment_source, NULL);
         glCompileShader(sFragment);
-        shaderHandleErrors(program, 2,sFragment);
-        glAttachShader(program->id, sFragment);
+        shaderHandleErrors(p_shader, 2,sFragment);
+        glAttachShader(p_shader->id, sFragment);
 
-        glLinkProgram(program->id);
+        glLinkProgram(p_shader->id);
 
-        shaderProgramHandleErrors(program);
+        shaderProgramHandleErrors(p_shader);
 
         glDeleteShader(sVertex);
         glDeleteShader(sFragment);
@@ -70,7 +70,7 @@ int shaderProgramCompile(const ShaderProgram *program) {
         return EXIT_SUCCESS;
 }
 
-void shaderHandleErrors(const ShaderProgram *p_shaderProgram, int type, unsigned int shader) {
+void shaderHandleErrors(struct ShaderProgram *p_shaderProgram, int type, unsigned int shader) {
         int success;
         char infoLog[1024];
 
@@ -82,13 +82,13 @@ void shaderHandleErrors(const ShaderProgram *p_shaderProgram, int type, unsigned
                 const char *source;
                 switch (type) {
                         case 1:
-                                source = p_shaderProgram->vertexSource;
+                                source = p_shaderProgram->str_vertex_source;
                                 break;
                         case 2:
-                                source = p_shaderProgram->fragmentSource;
+                                source = p_shaderProgram->str_fragment_source;
                                 break;
                         case 3:
-                                source = p_shaderProgram->geometrySource;
+                                source = p_shaderProgram->str_geometry_source;
                                 break;
                         default:
                                 break;
@@ -97,7 +97,7 @@ void shaderHandleErrors(const ShaderProgram *p_shaderProgram, int type, unsigned
                 exit(EXIT_FAILURE);
         }
 }
-void shaderProgramHandleErrors(const ShaderProgram *p_shaderProgram) {
+void shaderProgramHandleErrors(struct ShaderProgram *p_shaderProgram) {
         int success;
         char infoLog[1024];
 
@@ -110,23 +110,25 @@ void shaderProgramHandleErrors(const ShaderProgram *p_shaderProgram) {
         }
 }
 
-int uniformGetLocation(int *location,
-                       const ShaderProgram *shader,
-                       const char *uniformName) {
-        *location = (int)glGetUniformLocation(shader->id, uniformName);
+int uniformGetLocation(
+        int *location,
+        struct ShaderProgram *p_shader,
+        const char *uniformName
+) {
+        *location = (int)glGetUniformLocation(p_shader->id, uniformName);
         if (*location == -1) {
                 fprintf(stderr,
                         "[SHADER:UNIFORM] -> Uniform parameter `%s` not found:\n%s\n%s\n%s\n",
-                        uniformName, shader->vertexSourcePath, shader->fragmentSourcePath, shader->geometrySourcePath);
+                        uniformName, p_shader->str_vertex_source_path, p_shader->str_fragment_source_path, p_shader->str_geometry_source_path);
                 exit(EXIT_FAILURE);
         }
 
         return EXIT_SUCCESS;
 }
 
-int shaderSetMat3(ShaderProgram *shader, const char *uniformName, mat3 *value) {
+int shader_set_mat3(struct ShaderProgram *p_shader, const char *str_uniform_name, mat3 *value) {
         int location;
-        uniformGetLocation(&location, shader, uniformName);
+        uniformGetLocation(&location, p_shader, str_uniform_name);
 
         glUniformMatrix3fv(location, 1, GL_FALSE, (const GLfloat *)value);
 
@@ -134,43 +136,43 @@ int shaderSetMat3(ShaderProgram *shader, const char *uniformName, mat3 *value) {
 }
 
 
-int shaderSetMat4(ShaderProgram *shader, const char *uniformName, mat4 *value) {
+int shader_set_mat4(struct ShaderProgram *p_shader, const char *str_uniform_name, mat4 *value) {
         int location;
-        uniformGetLocation(&location, shader, uniformName);
+        uniformGetLocation(&location, p_shader, str_uniform_name);
 
         glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat *)value);
 
         return EXIT_SUCCESS;
 }
 
-int shaderSetVec3f(ShaderProgram *shader, const char *uniformName, vec3 value) {
+int shader_set_vec3f(struct ShaderProgram *p_shader, const char *str_uniform_name, vec3 value) {
         int location;
-        uniformGetLocation(&location, shader, uniformName);
+        uniformGetLocation(&location, p_shader, str_uniform_name);
 
         glUniform3f(location, value[0], value[1], value[2]);
 
         return EXIT_SUCCESS;
 }
 
-int shaderSetVec4f(ShaderProgram *shader, const char *uniformName, vec4 value) {
+int shaderSetVec4f(struct ShaderProgram *p_shader, const char *str_uniform_name, vec4 value) {
         int location;
-        uniformGetLocation(&location, shader, uniformName);
+        uniformGetLocation(&location, p_shader, str_uniform_name);
 
         glUniform4f(location, value[0], value[1], value[2], value[3]);
 
         return EXIT_SUCCESS;
 }
 
-int shaderSetVec2f(ShaderProgram *shader, const char *uniformName, vec2 value) {
+int shaderSetVec2f(struct ShaderProgram *p_shader, const char *str_uniform_name, vec2 value) {
         int location;
-        uniformGetLocation(&location, shader, uniformName);
+        uniformGetLocation(&location, p_shader, str_uniform_name);
 
         glUniform2f(location, value[0], value[1]);
 
         return EXIT_SUCCESS;
 }
 
-int shaderSetFloat(const ShaderProgram *shader, const char *uniformName, float value) {
+int shaderSetFloat(struct ShaderProgram *shader, const char *uniformName, float value) {
         int location;
         uniformGetLocation(&location, shader, uniformName);
 
@@ -179,9 +181,9 @@ int shaderSetFloat(const ShaderProgram *shader, const char *uniformName, float v
         return EXIT_SUCCESS;
 }
 
-int shaderSetInt(const ShaderProgram *shader, const char *uniformName, int value) {
+int shaderSetInt(struct ShaderProgram *p_shader, const char *uniformName, int value) {
         int location;
-        uniformGetLocation(&location, shader, uniformName);
+        uniformGetLocation(&location, p_shader, uniformName);
 
         glUniform1i(location, value);
 

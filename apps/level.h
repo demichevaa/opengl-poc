@@ -6,14 +6,13 @@
 #include "viewport.h"
 
 
-typedef struct Level {
-        Block ** blocks;
-        int rowsCount;
-        int columnsCount;
+struct Level {
+        Block **blocks;
+        int rows_count;
+        int columns_count;
+};
 
-} Level;
-
-int levelInitialize(Level *level, int rowsCount, int colsCount, int data[rowsCount][colsCount]);
-int levelRender(Level *pLevel);
+int level_initialize(struct Level *p_level, int rows_count, int cols_count, int data[rows_count][cols_count]);
+int level_render(struct Level *p_level);
 
 #endif //OPENGL_POC_APPS_LEVEL_H_

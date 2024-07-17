@@ -1,6 +1,6 @@
 #include "collision.h"
 
-int collision_check_ABBB(Sprite *p_a, Sprite *p_b) {
+int collision_check_ABBB(struct Sprite *p_a, struct Sprite *p_b) {
         float a_x_right = p_a->X + p_a->width;
         float a_x_left = p_a->X;
         float a_y_top = p_a->Y + p_a->height;

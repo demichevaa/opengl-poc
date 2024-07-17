@@ -4,5 +4,5 @@
 
 Test(utils, s) {
 
-    assetGetContent(NULL);
+        asset_get_content(NULL);
 }

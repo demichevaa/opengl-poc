@@ -7,16 +7,14 @@
 
 
 struct Platform {
-    Sprite sprite;
+    struct Sprite sprite;
     vec2 position;
-//    float x;
-//    float y;
     float velocity;
     float size;
 };
 
-struct Platform platformCreate();
-int platformRender(struct Platform *p_platform, float timeDelta);
-int platformHandleInput(struct Platform *p_platform, enum Actions action, float timeDelta);
+struct Platform platform_create();
+int platform_render(struct Platform *p_platform, float time_delta);
+int platform_handle_input(struct Platform *p_platform, enum Actions action, float time_delta);
 
 #endif //OPENGL_POC_PLATFORM_H

@@ -8,16 +8,14 @@
 
 struct Ball {
     float radius;
-    vec2 velocity;
     vec2 direction;
     float speed;
-    Sprite sprite;
+    struct Sprite sprite;
     vec2 position;
     int damage;
 };
 
-struct Ball ballCreate();
-int ballRender(struct Ball *p_ball, float timeDelta);
-
-
+struct Ball ball_create();
+int ball_render(struct Ball *p_ball, float time_delta);
+int ball_update(struct Ball *p_ball, float time_delta);
 #endif //OPENGL_POC_BALL_H

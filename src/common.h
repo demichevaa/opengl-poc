@@ -4,7 +4,7 @@
 #include "viewport.h"
 
 typedef int (*Callback)(void *);
-int clampToViewport(vec2 centerPosition, float width, float height);
+int clamp_to_viewport(vec2 centerPosition, float width, float height);
 int for_each(void *data, size_t dim_1, size_t dim_2, size_t elem_size, Callback callback);
 
 struct Direction {
@@ -14,7 +14,7 @@ struct Direction {
     vec2 Right;
 };
 
-static const struct Direction DIRECTION = {
+static struct Direction DIRECTION = {
         .Top = {0.0f , 1.0f},
         .Bottom = {0.0f, -1.0f},
         .Left = {-1.0f, 0.0f},

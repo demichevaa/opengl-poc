@@ -23,19 +23,19 @@ void mat4_mul(mat4 a, mat4 b, mat4 result) {
         }
 }
 
-int spriteInitialize(Sprite *sprite,
-                     const char *tag,
-                     ShaderProgram *shader,
-                     Texture2D *texture) {
-        sprite->tag = tag;
-        sprite->shader = shader;
-        sprite->texture = texture;
+int sprite_initialize(
+        struct Sprite *p_sprite,
+        struct ShaderProgram *p_shader,
+        struct Texture2D *p_texture
+) {
+        p_sprite->p_shader = p_shader;
+        p_sprite->p_texture = p_texture;
 
-        sprite->height = 10;
-        sprite->width = 10;
-        sprite->X = 0;
-        sprite->Y = 0;
-        memcpy(sprite->color, PALETTE.transparent, sizeof(vec4));
+        p_sprite->height = 10;
+        p_sprite->width = 10;
+        p_sprite->X = 0;
+        p_sprite->Y = 0;
+        memcpy(p_sprite->color, PALETTE.transparent, sizeof(vec4));
 
         GLuint VBO, VAO, EBO;
         glGenVertexArrays(1, &VAO);
@@ -58,58 +58,57 @@ int spriteInitialize(Sprite *sprite,
 
         glBindVertexArray(0);
 
-        sprite->VBO = VBO;
-        sprite->VAO = VAO;
-        sprite->EBO = EBO;
-        spriteApplyModel(sprite);
+        p_sprite->VBO = VBO;
+        p_sprite->VAO = VAO;
+        p_sprite->EBO = EBO;
+        sprite_apply_model(p_sprite);
 
         return EXIT_SUCCESS;
 }
 
-int spriteRender(Sprite *sprite, Callback callback) {
+int sprite_render(struct Sprite *p_sprite, Callback callback) {
         glActiveTexture(GL_TEXTURE0);
-        textureBind(sprite->texture);
+        texture_bind(p_sprite->p_texture);
 
-        shaderProgramUse(sprite->shader);
+        shader_use(p_sprite->p_shader);
 
 
         if (callback != NULL) {
-                callback(sprite);
+                callback(p_sprite);
         }
-        spriteApplyModel(sprite);
-        shaderSetMat4(sprite->shader, "uMVP", &sprite->MVP);
-        shaderSetVec4f(sprite->shader, "uColor", sprite->color);
-        shaderSetInt(sprite->shader, "uTexture", 0);
+        sprite_apply_model(p_sprite);
+        shader_set_mat4(p_sprite->p_shader, "uMVP", &p_sprite->MVP);
+        shaderSetVec4f(p_sprite->p_shader, "uColor", p_sprite->color);
+        shaderSetInt(p_sprite->p_shader, "uTexture", 0);
 
-        glBindVertexArray(sprite->VAO);
+        glBindVertexArray(p_sprite->VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         return EXIT_SUCCESS;
 }
 
-int spriteRelease(Sprite *sprite) {
-        free(sprite->shader);
-        free(sprite->texture);
+int sprite_free(struct Sprite *p_sprite) {
+        free(p_sprite->p_shader);
+        free(p_sprite->p_texture);
 
-        glDeleteVertexArrays(1, &sprite->VAO);
-        glDeleteBuffers(1, &sprite->EBO);
-        glDeleteBuffers(1, &sprite->VBO);
+        glDeleteVertexArrays(1, &p_sprite->VAO);
+        glDeleteBuffers(1, &p_sprite->EBO);
+        glDeleteBuffers(1, &p_sprite->VBO);
 
-        sprite->shader = NULL;
-        sprite->texture = NULL;
-        sprite->VAO = INT_MAX;
-        sprite->EBO = INT_MAX;
-        sprite->VBO = INT_MAX;
+        p_sprite->p_shader = NULL;
+        p_sprite->p_texture = NULL;
+        p_sprite->VAO = INT_MAX;
+        p_sprite->EBO = INT_MAX;
+        p_sprite->VBO = INT_MAX;
 
-        printf("[SPRITE:RELEASE] -> Sprite `%s` destroyed", sprite->tag);
-        //free(sprite);
-        sprite = NULL;
+        printf("[SPRITE:FREE] -> Sprite destroyed at (%fx%f)", p_sprite->X, p_sprite->Y);
+        p_sprite = NULL;
 
         return EXIT_SUCCESS;
 }
 
-int spriteApplyModel(Sprite *sprite) {
+int sprite_apply_model(struct Sprite *p_sprite) {
         mat4 model, view, projection, MVP, scale, translate, rotate;
         glm_mat4_identity(model);
         glm_mat4_identity(view);
@@ -119,11 +118,11 @@ int spriteApplyModel(Sprite *sprite) {
         glm_mat4_identity(rotate);
 
 
-        scale[0][0] = sprite->width;
-        scale[1][1] = sprite->height;
+        scale[0][0] = p_sprite->width;
+        scale[1][1] = p_sprite->height;
 
-        translate[0][3] = sprite->X;
-        translate[1][3] = sprite->Y;
+        translate[0][3] = p_sprite->X;
+        translate[1][3] = p_sprite->Y;
 
         mat4 tmp;
         mat4_mul(rotate, scale, tmp);
@@ -145,12 +144,12 @@ int spriteApplyModel(Sprite *sprite) {
         mat4_mul(projection, model, MVP);
         glm_mat4_transpose(MVP);
 
-        memcpy(sprite->MVP, MVP, sizeof(mat4));
+        memcpy(p_sprite->MVP, MVP, sizeof(mat4));
 
         return EXIT_SUCCESS;
 }
 
-int spriteSetPosition(Sprite *p_sprite, const vec2 centeredPosition) {
+int spriteSetPosition(struct Sprite *p_sprite, const vec2 centeredPosition) {
         p_sprite->X = centeredPosition[0] - p_sprite->width / 2.0f;
         p_sprite->Y = centeredPosition[1] - p_sprite->height / 2.0f;
 

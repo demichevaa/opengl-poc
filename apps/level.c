@@ -1,52 +1,51 @@
 #include "level.h"
 
-float calcColMargin(int colsCount, float colSize, float containerSize) {
-        return  (containerSize - ((float)colsCount * colSize)) / 2.0f;
+float calc_col_margin(int cols_count, float col_size, float container_size) {
+        return  (container_size - ((float)cols_count * col_size)) / 2.0f;
 }
 
+int level_initialize(struct Level *p_level, int rows_count, int cols_count, int data[rows_count][cols_count]) {
+        printf("[LEVEL:INITIALIZE] -> Loading level (%d %d)\n", rows_count, cols_count);
 
-int levelInitialize(Level *level, int rowsCount, int colsCount, int data[rowsCount][colsCount]) {
-        printf("[LEVEL:INITIALIZE] -> Loading level (%d %d)\n", rowsCount, colsCount);
+        p_level->rows_count = rows_count;
+        p_level->columns_count = cols_count;
 
-        level->rowsCount = rowsCount;
-        level->columnsCount = colsCount;
+        float block_width = 10.0f;
+        float block_height = 3.0f;
 
-        float blockWidth = 10.0f;
-        float blockHeight = 3.0f;
+        float block_padding = 0.15f;
+        float block_width_aligned = block_width + block_padding;
+        float block_height_aligned = block_height + block_padding;
 
-        float blockPadding = 0.15f;
-        float blockWidthAligned = blockWidth + blockPadding;
-        float blockHeightAligned = blockHeight + blockPadding;
+        float col_margin = calc_col_margin(cols_count, block_width_aligned, VIEWPORT_WIDTH);
+        float row_margin = 1.0f;
 
-        float colMargin = calcColMargin(colsCount, blockWidthAligned, VIEWPORT_WIDTH);
-        float rowMargin = 1.0f;
-
-        float xOrigin = VIEWPORT_ORIGIN + colMargin;
-        float x = xOrigin;
-        float y = VIEWPORT_HEIGHT - rowMargin;
+        float x_origin = VIEWPORT_ORIGIN + col_margin;
+        float x = x_origin;
+        float y = VIEWPORT_HEIGHT - row_margin;
 
 
-        level->blocks = malloc(rowsCount * sizeof(Block *));
-        for (int i = 0; i < rowsCount; i++) {
-                y -= blockHeightAligned;
-                level->blocks[i] = malloc(colsCount * sizeof(Block));
-                for (int j = 0; j < colsCount; j++) {
+        p_level->blocks = malloc(rows_count * sizeof(Block *));
+        for (int i = 0; i < rows_count; i++) {
+                y -= block_height_aligned;
+                p_level->blocks[i] = malloc(cols_count * sizeof(Block));
+                for (int j = 0; j < cols_count; j++) {
                         int s = data[i][j];
-                        Block block = blockCreateSimple(blockWidth, blockHeight, x, y, s, 5, true);
+                        Block block = block_create(block_width, block_height, x, y, s, 5, true);
 
-                        level->blocks[i][j] = block;
-                        x += blockWidthAligned;
+                        p_level->blocks[i][j] = block;
+                        x += block_width_aligned;
                 }
-                x = xOrigin;
+                x = x_origin;
         }
 
         return EXIT_SUCCESS;
 }
 
-int levelRender(Level *pLevel) {
-        for (int i = 0; i < pLevel->rowsCount; ++i) {
-                for (int j = 0; j < pLevel->columnsCount; ++j) {
-                        blockRender(&pLevel->blocks[i][j]);
+int level_render(struct Level *p_level) {
+        for (int i = 0; i < p_level->rows_count; ++i) {
+                for (int j = 0; j < p_level->columns_count; ++j) {
+                        block_render(&p_level->blocks[i][j]);
                 }
         }
 

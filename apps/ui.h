@@ -5,13 +5,11 @@
 #include "collections.h"
 #include "sprite.h"
 
-typedef struct UI {
-    struct LinkedList  *layoutTextures;
-    struct LinkedList *layoutSprites;
-    Sprite *backgroundTile;
-} UI;
+struct UI {
+    struct Sprite *background_tile;
+};
 
-int uiInitialize(UI *p_ui);
-int uiRender(UI *p_ui);
+int ui_initialize(struct UI *p_ui);
+int ui_render(struct UI *p_ui);
 
 #endif //OPENGL_POC_UI_H
