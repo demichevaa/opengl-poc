@@ -22,6 +22,8 @@ add_library(opengl-poc-lib assets.c
         common.h
         common.c
         input.h
+        collision.c
+        collision.h
 ) # Add other source files as needed
 target_include_directories(
         opengl-poc-lib

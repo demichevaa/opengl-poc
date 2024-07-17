@@ -13,6 +13,7 @@ struct Ball ballCreate() {
         ball.position[0] = VIEWPORT_WIDTH / 2;
         ball.position[1] = VIEWPORT_HEIGHT / 2;
         glm_vec2_copy(DIRECTION.Bottom, &ball.direction);
+        ball.damage = 1;
 
         ball.velocity[0] = 1.0f;
         ball.velocity[1] = 1.0f;

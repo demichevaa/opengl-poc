@@ -23,3 +23,26 @@ int clampToViewport(vec2 centerPosition, float width, float height) {
 
         return EXIT_SUCCESS;
 }
+
+int direction_invert(vec2 direction){
+        glm_vec2_scale(direction, -1.0f, direction);
+}
+
+int for_each(void *data, size_t dim_1, size_t dim_2, size_t elem_size, Callback callback) {
+        bool has_callback = callback != NULL;
+        bool has_dim_2 = dim_2 > 0;
+
+        for (size_t i = 0; i < dim_1; i++) {
+                if (has_callback && !has_dim_2) {
+                        callback((char *)data + i * elem_size);
+                        continue;
+                }
+
+                for (size_t j = 0; j < dim_2; j++) {
+                        if (has_callback) {
+                                callback((char *)data + (i * dim_2 + j) * elem_size);
+                        }
+                }
+        }
+        return EXIT_SUCCESS;
+}

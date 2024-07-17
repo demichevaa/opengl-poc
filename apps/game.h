@@ -7,6 +7,7 @@
 #include "platform.h"
 #include "input.h"
 #include "ball.h"
+#include "collision.h"
 
 typedef enum GameState {
         GAME_ACTIVE,
@@ -24,7 +25,7 @@ typedef struct Game {
 } Game;
 
 int gameInitialize(Game *pGame);
-int gameLoop(Game *p_game, GLFWwindow *p_window, float timeDelta);
-int gameHandleInput(Game *p_game, enum Actions action, float timeDelta);
+int game_loop(Game *p_game, GLFWwindow *p_window, float timeDelta);
+int game_handle_input(Game *p_game, enum Actions action, float time_delta);
 
 #endif //OPENGL_POC_APPS_GAME_H_

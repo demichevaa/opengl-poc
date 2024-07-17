@@ -4,6 +4,7 @@
 #include "sprite.h"
 #include "assets.h"
 #include "common.h"
+#include "block.h"
 
 struct Ball {
     float radius;
@@ -12,9 +13,11 @@ struct Ball {
     float speed;
     Sprite sprite;
     vec2 position;
+    int damage;
 };
 
 struct Ball ballCreate();
 int ballRender(struct Ball *p_ball, float timeDelta);
+
 
 #endif //OPENGL_POC_BALL_H
