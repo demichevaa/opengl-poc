@@ -7,7 +7,7 @@
 
 
 struct Level {
-        Block **blocks;
+        struct Block **blocks;
         int rows_count;
         int columns_count;
 };

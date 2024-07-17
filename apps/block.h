@@ -3,13 +3,12 @@
 
 #include "sprite.h"
 #include "assets.h"
-#include "ball.h"
 
-typedef struct Block {
+struct Block {
         struct Sprite sprite;
         int health;
         bool is_dead;
-} Block;
+};
 
 enum BlockType {
     WALL = -1,
@@ -20,9 +19,8 @@ enum BlockType {
     HP_1 = 1
 };
 
-Block block_create(float width, float height, float X, float Y, enum BlockType type,
+struct Block block_create(float width, float height, float X, float Y, enum BlockType type,
                           unsigned int hp, bool is_destroyable);
-int block_on_hit(Block *p_block, struct Ball *p_ball);
-int block_render(Block *p_block);
+int block_render(struct Block *p_block);
 
 #endif //OPENGL_POC_APPS_BLOCK_H_

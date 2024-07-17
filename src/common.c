@@ -24,7 +24,27 @@ int clamp_to_viewport(vec2 centerPosition, float width, float height) {
         return EXIT_SUCCESS;
 }
 
-int direction_invert(vec2 direction){
-        glm_vec2_scale(direction, -1.0f, direction);
+int vec2_invert(vec2 v, enum Axis axis) {
+        switch (axis) {
+                case X_AXIS:
+                        v[0] *= -1;
+                        break;
+                case Y_AXIS:
+                        v[1] *= -1;
+                        break;
+                case X_Y_AXES:
+                        glm_vec2_scale(v, -1.0f, v);
+                        break;
+                default:
+                        return EXIT_FAILURE;
+        }
+
+        return EXIT_SUCCESS;
+//        if (v[1] > v[0]) {
+//                v[0] *= -1;
+//                return EXIT_SUCCESS;
+//        }
+//        v[1] *= -1;
+//        return EXIT_SUCCESS;
 }
 

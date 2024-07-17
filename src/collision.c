@@ -1,6 +1,6 @@
 #include "collision.h"
 
-int collision_check_ABBB(struct Sprite *p_a, struct Sprite *p_b) {
+bool collision_check_ABBB(struct Sprite *p_a, struct Sprite *p_b) {
         float a_x_right = p_a->X + p_a->width;
         float a_x_left = p_a->X;
         float a_y_top = p_a->Y + p_a->height;
@@ -16,4 +16,8 @@ int collision_check_ABBB(struct Sprite *p_a, struct Sprite *p_b) {
         bool has_y_collision = a_y_top >= b_y_bottom && a_y_bottom <= b_y_top;
 
         return has_x_collision && has_y_collision;
+}
+
+bool collision_check_x(struct Sprite *p_a, float min_x, float max_x) {
+        return (p_a->X <= min_x) || (p_a->X + p_a->width) >= max_x;
 }

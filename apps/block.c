@@ -4,7 +4,7 @@
 
 int block_set_color(struct Block *p_block, enum BlockType color_code);
 
-Block block_create(
+struct Block block_create(
         float width,
         float height,
         float X,
@@ -24,7 +24,7 @@ Block block_create(
                 texture_create_from_assets(texture, "textures/block.png");
         }
 
-        Block block;
+        struct Block block;
         sprite_initialize(&block.sprite, shader, texture);
 
         block.sprite.width = width;
@@ -49,7 +49,7 @@ int block_render_uniform_callback(struct Sprite *p_sprite) {
         return EXIT_SUCCESS;
 }
 
-int block_render(Block *p_block) {
+int block_render(struct Block *p_block) {
         if (p_block->is_dead) {
                 return EXIT_SUCCESS;
         }
@@ -57,19 +57,7 @@ int block_render(Block *p_block) {
         return sprite_render(&p_block->sprite, (Callback) block_render_uniform_callback);
 }
 
-int block_on_hit(Block *p_block, struct Ball *p_ball) {
-        p_block->health -= p_ball->damage;
-        direction_invert(p_ball->direction);
 
-        printf("[BLOCK:HIT] -> Hit received. Hp: %i is_dead %i\n", p_block->health, p_block->is_dead);
-        if (p_block->health <= 0) {
-                p_block->is_dead = true;
-                printf("[BLOCK:DESTROYED] -> Destroying block. Hp: %i is_dead %i\n", p_block->health, p_block->is_dead);
-                sprite_free(&p_block->sprite);
-        }
-
-        return EXIT_SUCCESS;
-}
 
 
 int block_set_color(struct Block *p_block, enum BlockType color_code) {

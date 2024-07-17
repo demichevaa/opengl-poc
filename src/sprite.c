@@ -102,7 +102,7 @@ int sprite_free(struct Sprite *p_sprite) {
         p_sprite->EBO = INT_MAX;
         p_sprite->VBO = INT_MAX;
 
-        printf("[SPRITE:FREE] -> Sprite destroyed at (%fx%f)", p_sprite->X, p_sprite->Y);
+        printf("[SPRITE:FREE] -> Sprite destroyed at (%.2fx%.2f)\n", p_sprite->X, p_sprite->Y);
         p_sprite = NULL;
 
         return EXIT_SUCCESS;

@@ -25,13 +25,13 @@ int level_initialize(struct Level *p_level, int rows_count, int cols_count, int 
         float y = VIEWPORT_HEIGHT - row_margin;
 
 
-        p_level->blocks = malloc(rows_count * sizeof(Block *));
+        p_level->blocks = malloc(rows_count * sizeof(struct Block *));
         for (int i = 0; i < rows_count; i++) {
                 y -= block_height_aligned;
-                p_level->blocks[i] = malloc(cols_count * sizeof(Block));
+                p_level->blocks[i] = malloc(cols_count * sizeof(struct Block));
                 for (int j = 0; j < cols_count; j++) {
                         int s = data[i][j];
-                        Block block = block_create(block_width, block_height, x, y, s, 5, true);
+                        struct Block block = block_create(block_width, block_height, x, y, s, 5, true);
 
                         p_level->blocks[i][j] = block;
                         x += block_width_aligned;

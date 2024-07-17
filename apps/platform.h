@@ -4,7 +4,7 @@
 #include "sprite.h"
 #include "input.h"
 #include "assets.h"
-
+#include "common.h"
 
 struct Platform {
     struct Sprite sprite;

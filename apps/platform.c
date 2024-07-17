@@ -1,5 +1,4 @@
 #include "platform.h"
-#include "common.h"
 
 struct Platform platform_create() {
         struct ShaderProgram *program = malloc(sizeof(struct ShaderProgram));
@@ -43,3 +42,5 @@ int platform_handle_input(struct Platform *p_platform, enum Actions action, floa
 
         return EXIT_SUCCESS;
 }
+
+
