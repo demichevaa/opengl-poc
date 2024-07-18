@@ -31,9 +31,10 @@ struct Sprite {
 
 };
 
+typedef int (*UniformCallback)(struct Sprite *, void *);
 
 int sprite_initialize(struct Sprite *p_sprite, struct ShaderProgram *p_shader, struct Texture2D *p_texture);
-int sprite_render(struct Sprite *p_sprite, Callback callback);
+int sprite_render(struct Sprite *p_sprite, void *context, UniformCallback callback);
 int sprite_free(struct Sprite *p_sprite);
 int sprite_set_scale(struct Sprite *p_sprite, vec2 scale);
 int sprite_set_rotation_angle(struct Sprite *p_sprite, float angle);

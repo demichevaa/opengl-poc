@@ -27,6 +27,10 @@ int game_initialize(struct GameState *p_state) {
         p_state->level = level_1;
         p_state->status = GAME_ACTIVE;
 
+        p_state->platform_id = p_state->platform.id;
+        p_state->ball_id = p_state->ball.id;
+        p_state->level_id = p_state->level.id;
+
         EXIT_SUCCESS;
 }
 
@@ -75,24 +79,28 @@ int game_handle_input(struct GameState *p_state, enum Actions action, float time
 
 int game_detect_collisions(struct GameState *p_state) {
         struct Ball *p_ball = &p_state->ball;
-        bool is_platform_hit = collision_check_ABBB(&p_state->platform.sprite, &p_ball->sprite);
+        struct Platform *p_platform = &p_state->platform;
+
+        bool is_platform_hit = collision_check_circle_ABBB(&p_ball->sprite, &p_platform->sprite);
+
+        if (is_platform_hit && !p_platform->has_active_collision) {
+                p_platform->has_active_collision = true;
+                return ball_on_hit_platform(p_ball, p_platform);
+        }
+        if (!is_platform_hit && p_platform->has_active_collision) {
+                p_platform->has_active_collision = false;
+        }
+
         bool is_wall_hit = collision_check_x(&p_ball->sprite, VIEWPORT_ORIGIN, VIEWPORT_WIDTH);
-
-        if (is_platform_hit) {
-                ball_on_hit_platform(&p_state->ball, &p_state->platform);
-                return EXIT_SUCCESS;
-        }
         if (is_wall_hit) {
-                ball_on_hit_wall(p_ball);
-                return EXIT_SUCCESS;
+                return ball_on_hit_wall(p_ball);
         }
-
 
         return game_for_each_active_block(p_state, handle_ball_collision);
 }
 
 int handle_ball_collision(struct GameState *p_state, struct Block *p_block) {
-        bool is_block_hit = collision_check_ABBB(&p_block->sprite, &p_state->ball.sprite);
+        bool is_block_hit = collision_check_circle_ABBB(&p_state->ball.sprite, &p_block->sprite);
         if (is_block_hit) {
                 ball_on_hit_block(&p_state->ball, p_block);
                 return EXIT_SUCCESS;
@@ -122,3 +130,6 @@ int game_for_each_active_block(struct GameState *p_state, LevelCallback handleBl
         }
         return EXIT_SUCCESS;
 }
+
+
+

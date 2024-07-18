@@ -17,7 +17,11 @@ enum GameStatus {
 
 struct GameState {
         enum GameStatus status;
+
         struct Platform platform;
+        size_t platform_id;
+        size_t ball_id;
+        size_t level_id;
         struct Ball ball;
         struct UI ui;
         struct Level level;

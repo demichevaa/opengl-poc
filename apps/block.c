@@ -1,5 +1,5 @@
 #include "block.h"
-
+#include "register.h"
 
 
 int block_set_color(struct Block *p_block, enum BlockType color_code);
@@ -25,6 +25,9 @@ struct Block block_create(
         }
 
         struct Block block;
+        block.id = sequence_get_next();
+        register_add(block.id, &block);
+
         sprite_initialize(&block.sprite, shader, texture);
 
         block.sprite.width = width;
@@ -42,9 +45,9 @@ struct Block block_create(
         return block;
 }
 
-int block_render_uniform_callback(struct Sprite *p_sprite) {
+int block_render_uniform_callback(struct Sprite *p_sprite, void *context) {
         float aspect_ratio = p_sprite->width / p_sprite->height;
-        shaderSetFloat(p_sprite->p_shader, "uTextureAspectRatio", aspect_ratio);
+        shader_set_float(p_sprite->p_shader, "uTextureAspectRatio", aspect_ratio);
 
         return EXIT_SUCCESS;
 }
@@ -54,11 +57,8 @@ int block_render(struct Block *p_block) {
                 return EXIT_SUCCESS;
         }
 
-        return sprite_render(&p_block->sprite, (Callback) block_render_uniform_callback);
+        return sprite_render(&p_block->sprite, NULL, (UniformCallback) block_render_uniform_callback);
 }
-
-
-
 
 int block_set_color(struct Block *p_block, enum BlockType color_code) {
         switch (color_code) {

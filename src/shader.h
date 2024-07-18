@@ -33,7 +33,7 @@ int shader_set_mat4(struct ShaderProgram *p_shader, const char *str_uniform_name
 int shader_set_vec3f(struct ShaderProgram *p_shader, const char *str_uniform_name, vec3 value);
 int shaderSetVec4f(struct ShaderProgram *p_shader, const char *str_uniform_name, vec4 value);
 int shaderSetInt(struct ShaderProgram *p_shader, const char *str_uniform_name, int value);
-int shaderSetFloat(struct ShaderProgram *p_shader, const char *str_uniform_name, float value);
+int shader_set_float(struct ShaderProgram *p_shader, const char *str_uniform_name, float value);
 int shaderSetVec2f(struct ShaderProgram *p_shader, const char *str_uniform_name, vec2 value);
 
 

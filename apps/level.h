@@ -7,6 +7,7 @@
 
 
 struct Level {
+        size_t id;
         struct Block **blocks;
         int rows_count;
         int columns_count;

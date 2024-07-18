@@ -20,7 +20,6 @@ add_library(opengl-poc-lib assets.c
         render.c
         common.c
         common.h
-        common.c
         input.h
         collision.c
         collision.h

@@ -172,9 +172,9 @@ int shaderSetVec2f(struct ShaderProgram *p_shader, const char *str_uniform_name,
         return EXIT_SUCCESS;
 }
 
-int shaderSetFloat(struct ShaderProgram *shader, const char *uniformName, float value) {
+int shader_set_float(struct ShaderProgram *p_shader, const char *str_uniform_name, float value) {
         int location;
-        uniformGetLocation(&location, shader, uniformName);
+        uniformGetLocation(&location, p_shader, str_uniform_name);
 
         glUniform1f(location, value);
 

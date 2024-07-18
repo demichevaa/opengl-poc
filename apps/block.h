@@ -4,7 +4,9 @@
 #include "sprite.h"
 #include "assets.h"
 
+
 struct Block {
+        size_t id;
         struct Sprite sprite;
         int health;
         bool is_dead;

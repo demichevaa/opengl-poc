@@ -66,7 +66,7 @@ int sprite_initialize(
         return EXIT_SUCCESS;
 }
 
-int sprite_render(struct Sprite *p_sprite, Callback callback) {
+int sprite_render(struct Sprite *p_sprite, void *p_context, UniformCallback callback) {
         glActiveTexture(GL_TEXTURE0);
         texture_bind(p_sprite->p_texture);
 
@@ -74,8 +74,9 @@ int sprite_render(struct Sprite *p_sprite, Callback callback) {
 
 
         if (callback != NULL) {
-                callback(p_sprite);
+                callback(p_sprite, p_context);
         }
+
         sprite_apply_model(p_sprite);
         shader_set_mat4(p_sprite->p_shader, "uMVP", &p_sprite->MVP);
         shaderSetVec4f(p_sprite->p_shader, "uColor", p_sprite->color);

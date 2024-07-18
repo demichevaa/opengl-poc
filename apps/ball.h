@@ -7,13 +7,16 @@
 #include "block.h"
 #include "platform.h"
 
+
 struct Ball {
+    size_t id;
     float radius;
     vec2 direction;
     float speed;
     struct Sprite sprite;
     vec2 position;
     int damage;
+    bool has_collision;
 };
 
 struct Ball ball_create();

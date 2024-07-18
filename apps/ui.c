@@ -42,6 +42,7 @@ int background_uniform_callback(struct Sprite *p_sprite) {
 
 int ui_render(struct UI *p_ui) {
 
-        sprite_render(p_ui->background_tile, (Callback) background_uniform_callback);
+        sprite_render(p_ui->background_tile, NULL, (UniformCallback) background_uniform_callback);
+
         return EXIT_SUCCESS;
 }

@@ -1,4 +1,5 @@
 #include "level.h"
+#include "register.h"
 
 float calc_col_margin(int cols_count, float col_size, float container_size) {
         return  (container_size - ((float)cols_count * col_size)) / 2.0f;
@@ -6,6 +7,9 @@ float calc_col_margin(int cols_count, float col_size, float container_size) {
 
 int level_initialize(struct Level *p_level, int rows_count, int cols_count, int data[rows_count][cols_count]) {
         printf("[LEVEL:INITIALIZE] -> Loading level (%d %d)\n", rows_count, cols_count);
+
+        p_level->id = sequence_get_next();
+        register_add(p_level->id, p_level);
 
         p_level->rows_count = rows_count;
         p_level->columns_count = cols_count;
